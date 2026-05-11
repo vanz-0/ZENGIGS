@@ -1,0 +1,15 @@
+# Core
+python-dotenv>=1.0.0
+requests>=2.32.0
+
+# Lead Scraping
+apify-client>=1.8.0
+
+# Google Sheets (for future integration)
+gspread>=6.1.0
+google-auth>=2.36.0
+google-auth-oauthlib>=1.2.0
+google-api-python-client>=2.160.0
+
+# Data Processing
+pandas>=2.2.0

@@ -1,0 +1,27 @@
+# Environment variables
+.env
+*.env
+
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# Temporary files
+.tmp/
+*.log
+.DS_Store
+Thumbs.db
+
+# Credentials
+token.json
+credentials.json
+service_account.json

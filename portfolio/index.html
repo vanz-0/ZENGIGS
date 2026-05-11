@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZENGIGS | Tech-Powered Virtual Assistant</title>
+    <meta name="description" content="AI configuration, media production, and social media strategy with 24/7 availability.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="logo">ZENGIGS.</div>
+        <div class="nav-links">
+            <a href="#services">Services</a>
+            <a href="#portfolio">Work</a>
+            <a href="#contact" class="btn btn-primary">Book a Free Call</a>
+        </div>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <div class="badge">24/7 Premium Availability</div>
+            <h1>Tech-Powered <span class="gradient-text">Virtual Assistant</span></h1>
+            <p class="subtitle">Busy founders lose 20+ hours/week to content, admin, and tech setup. I eliminate that bottleneck.</p>
+            <div class="cta-group">
+                <a href="#contact" class="btn btn-primary lg">Hire Me</a>
+                <a href="#portfolio" class="btn btn-outline lg">View My Work</a>
+            </div>
+        </div>
+        <div class="hero-glow"></div>
+    </header>
+
+    <section id="services" class="services">
+        <div class="section-header">
+            <h2>Core Pillars of Execution</h2>
+            <p>I don't just complete tasks; I build systems.</p>
+        </div>
+        <div class="cards-container">
+            <div class="card glass-card">
+                <div class="icon-wrapper">⚙️</div>
+                <h3>AI & Automation</h3>
+                <p>JSON prompt engineering, API configuration, workflow automation (Zapier/Make), and chatbot training.</p>
+                <div class="card-footer">
+                    <span class="price">From $150 flat</span>
+                </div>
+            </div>
+            <div class="card glass-card">
+                <div class="icon-wrapper">🎬</div>
+                <h3>Media Production</h3>
+                <p>Short & long-form video editing, YouTube thumbnails, photo retouching, and brand visual kits.</p>
+                <div class="card-footer">
+                    <span class="price">From $35 / edit</span>
+                </div>
+            </div>
+            <div class="card glass-card">
+                <div class="icon-wrapper">📱</div>
+                <h3>Social Media Strategy</h3>
+                <p>Content calendar creation, scheduling, analytics reporting, and engagement management.</p>
+                <div class="card-footer">
+                    <span class="price">From $120 / week</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="portfolio" class="portfolio">
+        <div class="section-header">
+            <h2>Featured Work</h2>
+        </div>
+        <div class="portfolio-grid">
+            <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(45deg, #1f1c2c, #928DAB);"></div>
+                <div class="portfolio-info">
+                    <h4>E-commerce Chatbot System</h4>
+                    <p>AI & Automation</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(45deg, #ff7e5f, #feb47b);"></div>
+                <div class="portfolio-info">
+                    <h4>Viral TikTok Editing</h4>
+                    <p>Media Production</p>
+                </div>
+            </div>
+            <div class="portfolio-item">
+                <div class="portfolio-image" style="background: linear-gradient(45deg, #00c6ff, #0072ff);"></div>
+                <div class="portfolio-info">
+                    <h4>30-Day Content Calendar</h4>
+                    <p>Social Media Strategy</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tech-stack">
+        <h2>My Tech Stack</h2>
+        <div class="stack-tags">
+            <span>ChatGPT Plus</span>
+            <span>Claude Pro</span>
+            <span>Premiere Pro</span>
+            <span>Canva</span>
+            <span>Make.com</span>
+            <span>Zapier</span>
+            <span>Notion</span>
+            <span>Later</span>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="contact-box glass-card">
+            <h2>Ready to reclaim your time?</h2>
+            <p>Stop doing $15/hr tasks. Let's scale your operations.</p>
+            <div class="packages">
+                <div class="package">
+                    <strong>Starter Pack</strong>
+                    <span>20 hrs/mo — $480</span>
+                </div>
+                <div class="package">
+                    <strong>Growth Pack</strong>
+                    <span>40 hrs/mo — $940</span>
+                </div>
+                <div class="package">
+                    <strong>Premium 24/7</strong>
+                    <span>80 hrs/mo — $1,800</span>
+                </div>
+            </div>
+            <a href="https://calendly.com/" class="btn btn-primary lg" target="_blank">Schedule a Discovery Call</a>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 ZENGIGS. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Simple scroll reveal animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = 1;
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.glass-card, .portfolio-item, .section-header').forEach((el) => {
+            el.style.opacity = 0;
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
