@@ -1,66 +1,56 @@
-# Lead Scraping & Enrichment
+# Directive 05: Lead Scraping & Enrichment Pipeline
 
 ## Goal
-Scrape B2B leads from public sources (Apify, Google Maps), normalize the data, and optionally enrich with verified email addresses. Deliver clean, actionable lead lists ready for outreach.
+Scrape B2B leads from public sources (Apify, Google Maps), normalize the data into a unified schema, and optionally enrich with verified email addresses. The final output is synchronized to the Supabase `leads` table and exported to a CSV.
+
+## Architecture
+- **Layer 1 (Directive)**: This document.
+- **Layer 2 (Orchestration)**: System logic reading inputs and calling execution tools.
+- **Layer 3 (Execution)**: `execution/pipeline_orchestrator.py`, `execution/scrape_leads.py`
 
 ## Inputs
 | Parameter | Required | Description |
 |-----------|----------|-------------|
-| `--query` | Yes | Search query (e.g., "Coaches", "SaaS Founders") |
+| `--query` | Yes | Search query (e.g., "SaaS Founders") |
 | `--location` | Yes | Geographic target (e.g., "United States") |
-| `--max_items` | No | Max results to scrape (default: 25) |
-| `--output_prefix` | No | Filename prefix (default: "leads") |
-| `--no-email-filter` | No | Skip email validation filter (faster, more results) |
+| `--max_items` | No | Max results to scrape (default: 50) |
+| `--no-email-filter`| No | Skip email validation filter during scrape |
 
-## Tools/Scripts
-- Script: `execution/scrape_leads.py` (Apify lead scraping)
-- Script: `execution/lead_scraper.py` (CSV normalization)
-- Dependencies: `apify-client`, `python-dotenv`
+## Process Flow
 
-## Process
+1. **Initialization & Scrape**
+   - Execute `execution/pipeline_orchestrator.py --action scrape --query "<Query>" --location "<Location>"`
+   - Script triggers Apify actor `code_crafter/leads-finder`.
+   - Handles retries (up to 3x) for Apify timeouts.
 
-1. **Test Scrape**
-   - Run: `python execution/scrape_leads.py --query "Coaches" --location "United States" --max_items 25`
-   - Output: `.tmp/test_leads.json`
+2. **Normalization**
+   - Raw JSON output is automatically normalized by the pipeline into a standard schema: `email, first_name, last_name, company, website, location, niche, status`.
+   - Missing names drop the lead unless `status` is marked 'for_enrichment'.
 
-2. **Verification**
-   - Read `.tmp/test_leads.json`.
-   - Check if ≥80% of leads match the target industry.
-   - **Pass**: Proceed to full scrape.
-   - **Fail**: Refine query or location, re-run test.
+3. **Data Synchronization (Supabase)**
+   - Normalized leads are bulk-upserted into the Supabase `public.leads` table.
+   - Deduplication is handled natively via the `email` UNIQUE constraint in Supabase.
 
-3. **Full Scrape**
-   - Run: `python execution/scrape_leads.py --query "Coaches" --location "United States" --max_items 200`
-   - Output: `.tmp/leads_[timestamp].json`
+4. **[OPTIONAL] Email Enrichment**
+   - If `--enrich` flag is passed, missing emails are sent to Hunter.io or AnyMailFinder API.
 
-4. **Normalize to CSV**
-   - Run: `python execution/lead_scraper.py --input .tmp/leads_[timestamp].json --output execution/leads.csv`
-   - Standardizes fields: `first_name`, `last_name`, `email`, `company`, `website`, `location`.
+## Cost Analysis (Tracking)
+The system calculates cost dynamically after each run:
+- **Apify leads-finder**: ~$0.01 per lead
+- **Email enrichment**: ~$0.01 per successful API hit
+- The total cost is logged to the CLI output. *Rule: Maximum budget per run is $10 unless overridden.*
 
-5. **[OPTIONAL] Email Enrichment**
-   - If emails are missing, use AnyMailFinder or Hunter.io API.
-   - Requires `ANYMAILFINDER_API_KEY` in `.env`.
+## Error Handling & Rate Limiting
+- **Apify API Errors**: The script implements exponential backoff (2s, 4s, 8s) if the API fails to respond.
+- **Database Connection Errors**: If Supabase is unreachable, data falls back to a `.tmp/leads_backup.json` file.
+- **Empty Results**: Broaden the query or change the location. Log the failed query to prevent future repeats.
 
-## Outputs (Deliverables)
-- **Primary**: `execution/leads.csv` — clean, normalized lead file ready for `cold_email_sender.py`.
-- **Intermediate** (not deliverables): `.tmp/test_leads.json`, `.tmp/leads_*.json`.
+## Learnable Patterns (Continuous Improvement)
+- **Pattern**: Queries with "Consultant" yield higher bounce rates than "Agency".
+- **Pattern**: Use `--no-email-filter` for initial wide-net scrapes, then enrich only the highly relevant leads to save Apify costs.
+- **Pattern**: Always ensure the niche matches the `query` parameter exactly for accurate personalization downstream.
 
-## Cost Considerations
-| Component | Cost per lead |
-|-----------|---------------|
-| Apify leads-finder | ~$0.01-0.02 |
-| Email enrichment (optional) | ~$0.01 |
-| **Total** | **~$0.01-0.03** |
-
-For 200 leads: ~$2-6 total.
-
-## Edge Cases
-- **No leads found**: Apify returns empty list. → Broaden search query.
-- **API Error**: Check `APIFY_API_TOKEN` in `.env`.
-- **Duplicate leads**: `lead_scraper.py` deduplicates by email address.
-- **Missing names**: Skip leads without `first_name` — they can't be personalized.
-
-## Learnings
-- Use `--no-email-filter` for initial scrapes, then enrich later for better coverage.
-- Location should be specific (city/state) for local businesses, broad (country) for remote services.
-- Apify's `code_crafter/leads-finder` actor is the most reliable for B2B contacts.
+## Outputs
+- **Primary**: Supabase `leads` table updated.
+- **Secondary**: `execution/leads.csv` (for legacy/manual processes).
+- **Temporary**: `.tmp/` folder contains raw JSON exports (safe to delete).

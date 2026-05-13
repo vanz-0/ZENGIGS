@@ -2,6 +2,9 @@
 python-dotenv>=1.0.0
 requests>=2.32.0
 
+# Database
+supabase>=2.4.0
+
 # Lead Scraping
 apify-client>=1.8.0
 

@@ -43,3 +43,12 @@
 - Created `raw/` directory, moved `VA_Business_Blueprint_2025.pdf`
 - Created `wiki/` directory with `index.md` (catalog) and `log.md` (this file)
 - Updated `AGENTS.md` to reflect Second Brain schema conventions
+
+## [2026-05-11] deploy | GitHub Synchronization
+- Initialized Git repository and created `.gitignore`
+- Pushed entire workspace (Next.js, Second Brain, Execution Scripts) to [vanz-0/ZENGIGS](https://github.com/vanz-0/ZENGIGS)
+
+## [2026-05-11] setup | Supabase Database
+- Configured `.env` with project URL and API keys.
+- Initialized `leads` and `kpi_metrics` tables via SQL migration.
+- System is now ready for lead storage and KPI tracking.

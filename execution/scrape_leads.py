@@ -1,29 +1,29 @@
 #!/usr/bin/env python3
 """
-Scrape leads using Apify's code_crafter/leads-finder actor.
+Scrape leads using Apify's code_crafter/leads-finder actor and save to Supabase.
 
 Usage:
-    python execution/scrape_leads.py --query "Coaches" --location "United States" --max_items 50
-    python execution/scrape_leads.py --query "SaaS Founders" --location "UK" --max_items 25 --no-email-filter
+    python execution/scrape_leads.py --query "SaaS Founders" --location "United States" --max_items 50
 """
 
 import os
 import sys
 import json
+import time
 import argparse
 import logging
 from datetime import datetime
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import List, Optional, Dict, Any
 
 # Configure logging
 logging.basicConfig(
-    level=logging.DEBUG if os.getenv("DEBUG") else logging.INFO,
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Try to load dotenv if available
+# Try to load dotenv
 try:
     from dotenv import load_dotenv
     load_dotenv()
@@ -36,14 +36,19 @@ except ImportError:
     logger.error("apify-client not installed. Run: pip install apify-client")
     sys.exit(1)
 
+try:
+    from supabase import create_client, Client
+except ImportError:
+    logger.error("supabase not installed. Run: pip install supabase")
+    sys.exit(1)
+
+# ─── Configuration ────────────────────────────────────────────────────────────
 
 @dataclass
 class ScrapeConfig:
-    """Configuration for a lead scraping run."""
     query: str
     location: str
-    max_items: int = 25
-    output_prefix: str = "leads"
+    max_items: int = 50
     require_email: bool = True
     job_titles: Optional[List[str]] = None
     company_keywords: Optional[List[str]] = None
@@ -56,16 +61,23 @@ class ScrapeConfig:
         if self.max_items < 1:
             raise ValueError("max_items must be at least 1")
 
+# ─── Supabase Client ──────────────────────────────────────────────────────────
+
+def get_supabase_client() -> Optional[Client]:
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
+    if not url or not key:
+        logger.error("SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY required in .env")
+        return None
+    return create_client(url, key)
+
+# ─── Scraper Logic ────────────────────────────────────────────────────────────
 
 def scrape_leads(config: ScrapeConfig) -> Optional[List[Dict[str, Any]]]:
-    """
-    Run the Apify actor to scrape leads.
-
-    Returns a list of lead dicts, or None on failure.
-    """
+    """Run Apify actor to scrape leads with exponential backoff."""
     api_token = os.getenv("APIFY_API_TOKEN")
     if not api_token:
-        logger.error("APIFY_API_TOKEN not found in environment. Check .env file.")
+        logger.error("APIFY_API_TOKEN not found in .env")
         return None
 
     client = ApifyClient(api_token)
@@ -77,13 +89,12 @@ def scrape_leads(config: ScrapeConfig) -> Optional[List[Dict[str, Any]]]:
         "contact_location": [config.location.lower()],
         "language": "en",
     }
-
     if config.require_email:
         run_input["email_status"] = ["validated"]
 
     logger.info(f"Starting scrape for '{config.query}' in '{config.location}' (limit: {config.max_items})")
-    logger.debug(f"Actor input: {json.dumps(run_input, indent=2)}")
 
+    # Exponential backoff for API calls
     max_retries = 3
     for attempt in range(max_retries):
         try:
@@ -91,56 +102,94 @@ def scrape_leads(config: ScrapeConfig) -> Optional[List[Dict[str, Any]]]:
             break
         except Exception as e:
             if attempt == max_retries - 1:
-                logger.error(f"Actor failed after {max_retries} attempts: {e}")
+                logger.error(f"Apify actor failed after {max_retries} attempts: {e}")
                 return None
-            logger.warning(f"Attempt {attempt + 1} failed: {e}. Retrying...")
+            wait_time = 2 ** (attempt + 1)
+            logger.warning(f"Attempt {attempt + 1} failed: {e}. Retrying in {wait_time}s...")
+            time.sleep(wait_time)
 
     if not run:
         logger.error("Actor run failed to start")
         return None
 
-    logger.info(f"Scrape finished. Fetching from dataset {run['defaultDatasetId']}...")
+    dataset_id = run["defaultDatasetId"]
+    logger.info(f"Scrape finished. Fetching from dataset {dataset_id}...")
 
-    results = list(client.dataset(run["defaultDatasetId"]).iterate_items())
-    logger.info(f"Found {len(results)} leads.")
+    results = list(client.dataset(dataset_id).iterate_items())
+    logger.info(f"Found {len(results)} raw leads.")
     return results
 
-
-def save_results(results: List[Dict], prefix: str = "leads") -> Optional[str]:
-    """Save results to a timestamped JSON file in .tmp/."""
+def normalize_and_save(results: List[Dict], niche: str) -> Dict[str, Any]:
+    """Normalize raw Apify data and save to Supabase."""
     if not results:
-        logger.warning("No results to save.")
-        return None
+        return {"success": False, "saved": 0, "error": "No results"}
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = ".tmp"
-    os.makedirs(output_dir, exist_ok=True)
+    supabase = get_supabase_client()
+    if not supabase:
+        return {"success": False, "saved": 0, "error": "No Supabase client"}
 
-    filename = os.path.join(output_dir, f"{prefix}_{timestamp}.json")
+    normalized = []
+    for row in results:
+        email = row.get("email") or row.get("contact_email")
+        first_name = row.get("first_name") or row.get("contact_first_name", "")
+        last_name = row.get("last_name") or row.get("contact_last_name", "")
+        company = row.get("company_name") or row.get("company", "")
+        website = row.get("company_domain") or row.get("website", "")
+        location = row.get("contact_location") or row.get("location", "")
 
-    with open(filename, "w") as f:
-        json.dump(results, f, indent=2)
+        if not email:
+            continue # Email is required
 
-    logger.info(f"Results saved to {filename}")
+        normalized.append({
+            "email": email,
+            "first_name": first_name,
+            "last_name": last_name,
+            "company": company,
+            "website": website,
+            "location": location,
+            "niche": niche,
+            "status": "new",
+            "source": "apify_scrape"
+        })
 
-    # Print summary
-    response = {
-        "success": True,
-        "leadsFound": len(results),
-        "outputFile": filename,
-    }
-    print(json.dumps(response, indent=2))
-    return filename
+    if not normalized:
+        logger.warning("No leads had valid emails after normalization.")
+        return {"success": True, "saved": 0}
 
+    # Upsert to Supabase
+    saved_count = 0
+    try:
+        # Supabase Python client upsert
+        res = supabase.table("leads").upsert(normalized, on_conflict="email").execute()
+        saved_count = len(res.data)
+        logger.info(f"Successfully upserted {saved_count} leads to Supabase.")
+    except Exception as e:
+        logger.error(f"Supabase upsert failed: {e}")
+        # Fallback to local JSON
+        backup_file = f".tmp/leads_backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+        os.makedirs(".tmp", exist_ok=True)
+        with open(backup_file, "w") as f:
+            json.dump(normalized, f, indent=2)
+        logger.info(f"Saved normalized leads to {backup_file} as fallback.")
+        return {"success": False, "saved": 0, "error": str(e), "fallback": backup_file}
+
+    # Update KPI tracker
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        kpi_res = supabase.table("kpi_logs").upsert(
+            {"log_date": today, "leads_scraped": saved_count}, 
+            on_conflict="log_date"
+        ).execute()
+    except Exception as e:
+        logger.warning(f"Failed to update KPIs: {e}")
+
+    return {"success": True, "saved": saved_count}
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Scrape leads using Apify")
-    parser.add_argument("--query", required=True, help="Search query (e.g., 'Coaches')")
+    parser = argparse.ArgumentParser(description="Scrape B2B leads via Apify and sync to Supabase")
+    parser.add_argument("--query", required=True, help="Search query (e.g., 'SaaS Founders')")
     parser.add_argument("--location", required=True, help="Location (e.g., 'United States')")
-    parser.add_argument("--max_items", type=int, default=25, help="Max leads to scrape (default: 25)")
-    parser.add_argument("--output_prefix", default="leads", help="Output file prefix")
-    parser.add_argument("--job_titles", nargs='+', help="Specific job titles to target")
-    parser.add_argument("--company_keywords", nargs='+', help="Company keyword filters")
+    parser.add_argument("--max_items", type=int, default=50, help="Max leads to scrape")
     parser.add_argument("--no-email-filter", action="store_true", help="Don't filter by validated emails")
 
     args = parser.parse_args()
@@ -150,23 +199,31 @@ def main() -> None:
             query=args.query,
             location=args.location,
             max_items=args.max_items,
-            output_prefix=args.output_prefix,
             require_email=not args.no_email_filter,
-            job_titles=args.job_titles,
-            company_keywords=args.company_keywords,
         )
     except ValueError as e:
-        logger.error(f"Invalid configuration: {e}")
+        logger.error(f"Invalid config: {e}")
         sys.exit(1)
 
+    # 1. Scrape
     results = scrape_leads(config)
 
+    # 2. Normalize and Sync
     if results:
-        save_results(results, prefix=config.output_prefix)
+        sync_res = normalize_and_save(results, niche=config.query)
+        
+        # Cost Tracking
+        cost_per_lead = 0.015 # Approx Apify cost
+        total_cost = config.max_items * cost_per_lead
+        logger.info(f"--- Cost Analysis ---")
+        logger.info(f"Requested leads : {config.max_items}")
+        logger.info(f"Estimated Cost  : ${total_cost:.2f}")
+        logger.info(f"Saved to DB     : {sync_res.get('saved', 0)}")
+        
+        print(json.dumps(sync_res))
     else:
-        print(json.dumps({"success": False, "error": "No leads found or API error."}, indent=2))
+        print(json.dumps({"success": False, "error": "No results or API failure"}))
         sys.exit(1)
-
 
 if __name__ == "__main__":
     main()

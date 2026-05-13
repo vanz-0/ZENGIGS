@@ -2,6 +2,7 @@ import { MynaHero } from "@/components/MynaHero";
 import { BentoGrid } from "@/components/BentoGrid";
 import { Pricing } from "@/components/Pricing";
 import { MinimalFooter } from "@/components/Footer";
+import { LiveMetrics } from "@/components/LiveMetrics";
 
 export default function Home() {
   return (
@@ -22,6 +23,10 @@ export default function Home() {
 
       <div id="services">
         <BentoGrid />
+      </div>
+
+      <div id="metrics">
+        <LiveMetrics />
       </div>
 
       <div id="pricing">

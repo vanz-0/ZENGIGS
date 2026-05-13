@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Automated cold email sender with SMTP, personalization, and rate limiting.
+Automated cold email sender with SMTP, personalization, Supabase sync, and rate limiting.
 
 Usage:
     python execution/cold_email_sender.py
@@ -10,39 +10,42 @@ Usage:
 
 import os
 import sys
-import csv
-import json
 import time
 import random
 import smtplib
 import logging
 import argparse
+import json
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime
 from dataclasses import dataclass
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Any
 
 # Configure logging
 logging.basicConfig(
-    level=logging.DEBUG if os.getenv("DEBUG") else logging.INFO,
+    level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
 
-# Try to load dotenv if available
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
 
+try:
+    from supabase import create_client, Client
+except ImportError:
+    logger.error("supabase not installed. Run: pip install supabase")
+    sys.exit(1)
+
 
 # ─── Configuration ────────────────────────────────────────────────────────────
 
 @dataclass
 class SMTPConfig:
-    """SMTP server configuration loaded from environment."""
     host: str
     port: int
     email: str
@@ -58,12 +61,18 @@ class SMTPConfig:
         sender_name = os.getenv("SENDER_NAME", "ZENGIGS")
 
         if not all([host, email, password]):
-            raise ValueError(
-                "Missing SMTP credentials. Ensure SMTP_HOST, SMTP_EMAIL, and SMTP_PASSWORD are set in .env"
-            )
+            raise ValueError("Missing SMTP credentials in .env")
 
         return cls(host=host, port=port, email=email, password=password, sender_name=sender_name)
 
+# ─── Supabase Client ──────────────────────────────────────────────────────────
+
+def get_supabase_client() -> Optional[Client]:
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
+    if not url or not key:
+        return None
+    return create_client(url, key)
 
 # ─── Email Templates ─────────────────────────────────────────────────────────
 
@@ -108,39 +117,34 @@ ZENGIGS"""
     },
 }
 
-
 # ─── Core Functions ───────────────────────────────────────────────────────────
 
-def load_leads(filepath: str) -> List[Dict[str, str]]:
-    """Load leads from a CSV file."""
-    if not os.path.exists(filepath):
-        logger.error(f"Leads file not found: {filepath}")
+def fetch_leads(supabase: Client, template: str, daily_cap: int) -> List[Dict]:
+    """Fetch leads from Supabase based on template strategy."""
+    try:
+        if template == "cold_intro":
+            # Fetch 'new' leads
+            res = supabase.table("leads").select("*").eq("status", "new").limit(daily_cap).execute()
+        else:
+            # Fetch 'contacted' leads for follow-ups
+            res = supabase.table("leads").select("*").eq("status", "contacted").limit(daily_cap).execute()
+        
+        return res.data
+    except Exception as e:
+        logger.error(f"Failed to fetch leads from Supabase: {e}")
         return []
 
-    leads = []
-    with open(filepath, "r", encoding="utf-8") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            # Skip leads without required fields
-            if not row.get("first_name") or not row.get("email"):
-                logger.warning(f"Skipping lead with missing name/email: {row}")
-                continue
-            leads.append(row)
-
-    logger.info(f"Loaded {len(leads)} leads from {filepath}")
-    return leads
-
-
-def personalize_email(template_name: str, lead: Dict[str, str], sender_name: str) -> Optional[Dict[str, str]]:
-    """Generate a personalized email from a template and lead data."""
+def personalize_email(template_name: str, lead: Dict, sender_name: str) -> Optional[Dict[str, str]]:
     template = TEMPLATES.get(template_name)
     if not template:
-        logger.error(f"Unknown template: {template_name}. Available: {list(TEMPLATES.keys())}")
         return None
 
+    first_name = lead.get("first_name") or "there"
+    company = lead.get("company") or "your company"
+
     placeholders = {
-        "first_name": lead.get("first_name", "there"),
-        "company": lead.get("company", "your company"),
+        "first_name": first_name.capitalize(),
+        "company": company,
         "sender_name": sender_name,
     }
 
@@ -149,9 +153,7 @@ def personalize_email(template_name: str, lead: Dict[str, str], sender_name: str
         "body": template["body"].format(**placeholders),
     }
 
-
 def send_email(smtp_config: SMTPConfig, to_email: str, subject: str, body: str) -> bool:
-    """Send a single email via SMTP with retry logic."""
     msg = MIMEMultipart()
     msg["From"] = f"{smtp_config.sender_name} <{smtp_config.email}>"
     msg["To"] = to_email
@@ -166,130 +168,127 @@ def send_email(smtp_config: SMTPConfig, to_email: str, subject: str, body: str) 
                 server.login(smtp_config.email, smtp_config.password)
                 server.send_message(msg)
             return True
-
         except smtplib.SMTPRecipientsRefused:
             logger.warning(f"Recipient refused (bounced): {to_email}")
-            return False  # Don't retry bounces
-
-        except smtplib.SMTPException as e:
-            if attempt == max_retries - 1:
-                logger.error(f"SMTP error after {max_retries} attempts for {to_email}: {e}")
-                return False
-            wait_time = 2 ** attempt
-            logger.warning(f"SMTP error (attempt {attempt + 1}): {e}. Retrying in {wait_time}s...")
-            time.sleep(wait_time)
-
-        except Exception as e:
-            logger.error(f"Unexpected error sending to {to_email}: {e}")
             return False
-
+        except smtplib.SMTPAuthenticationError:
+            logger.error("SMTP Authentication Error. Check .env credentials.")
+            return False
+        except Exception as e:
+            if attempt == max_retries - 1:
+                logger.error(f"SMTP error after {max_retries} attempts: {e}")
+                return False
+            wait_time = 30 * (attempt + 1)
+            logger.warning(f"SMTP error: {e}. Retrying in {wait_time}s...")
+            time.sleep(wait_time)
     return False
 
+def update_supabase_logs(supabase: Client, lead: Dict, template: str, success: bool, error_msg: str = ""):
+    """Update lead status and outreach logs in Supabase."""
+    new_status = "contacted" if success else ("bounced" if "refused" in error_msg.lower() else "failed")
+    
+    try:
+        # Update lead status
+        supabase.table("leads").update({"status": new_status}).eq("id", lead["id"]).execute()
+        
+        # Insert outreach log
+        supabase.table("outreach_logs").insert({
+            "lead_id": lead["id"],
+            "email": lead["email"],
+            "template_used": template,
+            "status": "sent" if success else "failed",
+            "error_message": error_msg if not success else None
+        }).execute()
+        
+    except Exception as e:
+        logger.error(f"Failed to log outreach to Supabase: {e}")
 
-def log_send(log_file: str, lead: Dict, template: str, success: bool) -> None:
-    """Append a send record to the email log CSV."""
-    os.makedirs(os.path.dirname(log_file), exist_ok=True)
-    file_exists = os.path.exists(log_file)
-
-    with open(log_file, "a", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        if not file_exists:
-            writer.writerow(["timestamp", "email", "first_name", "company", "template", "status"])
-        writer.writerow([
-            datetime.now().isoformat(),
-            lead.get("email", ""),
-            lead.get("first_name", ""),
-            lead.get("company", ""),
-            template,
-            "sent" if success else "failed",
-        ])
-
+def update_kpi_tracker(supabase: Client, sent_count: int):
+    if sent_count == 0: return
+    try:
+        today = datetime.now().strftime("%Y-%m-%d")
+        
+        # Check if row exists
+        res = supabase.table("kpi_logs").select("emails_sent").eq("log_date", today).execute()
+        if res.data:
+            new_total = res.data[0]["emails_sent"] + sent_count
+            supabase.table("kpi_logs").update({"emails_sent": new_total}).eq("log_date", today).execute()
+        else:
+            supabase.table("kpi_logs").insert({"log_date": today, "emails_sent": sent_count}).execute()
+    except Exception as e:
+        logger.error(f"Failed to update KPIs: {e}")
 
 # ─── Main Pipeline ────────────────────────────────────────────────────────────
 
-def send_cold_emails(
-    leads_file: str = "execution/leads.csv",
-    template: str = "cold_intro",
-    daily_cap: int = 10,
-    dry_run: bool = False,
-) -> Dict:
-    """
-    Main outreach pipeline: load leads, personalize, send, log.
+def send_cold_emails(template: str = "cold_intro", daily_cap: int = 10, dry_run: bool = False):
+    supabase = get_supabase_client()
+    if not supabase:
+        logger.error("Could not connect to Supabase. Check .env.")
+        sys.exit(1)
 
-    Returns a summary dict with counts.
-    """
-    # Load config
     if not dry_run:
         try:
             smtp_config = SMTPConfig.from_env()
         except ValueError as e:
             logger.error(str(e))
-            return {"success": False, "error": str(e)}
+            sys.exit(1)
     else:
         smtp_config = None
         logger.info("🏜️  DRY RUN mode — no emails will actually be sent.")
 
-    # Load leads
-    leads = load_leads(leads_file)
+    leads = fetch_leads(supabase, template, daily_cap)
     if not leads:
-        return {"success": False, "error": f"No valid leads found in {leads_file}"}
+        logger.info(f"No leads found for template '{template}'.")
+        return
 
-    # Cap to daily limit
-    batch = leads[:daily_cap]
-    logger.info(f"Processing {len(batch)} leads (daily cap: {daily_cap}, template: {template})")
+    logger.info(f"Processing {len(leads)} leads (daily cap: {daily_cap}, template: {template})")
 
-    log_file = ".tmp/email_log.csv"
     sent = 0
     failed = 0
 
-    for i, lead in enumerate(batch):
+    for i, lead in enumerate(leads):
         email_data = personalize_email(template, lead, smtp_config.sender_name if smtp_config else "ZENGIGS")
         if not email_data:
             failed += 1
             continue
 
         if dry_run:
-            logger.info(f"  [{i+1}/{len(batch)}] Would send to {lead['email']}: \"{email_data['subject']}\"")
+            logger.info(f"  [{i+1}/{len(leads)}] Would send to {lead['email']}: \"{email_data['subject']}\"")
             sent += 1
         else:
             success = send_email(smtp_config, lead["email"], email_data["subject"], email_data["body"])
-            log_send(log_file, lead, template, success)
+            
+            error_msg = "" if success else "SMTP Send Failed"
+            update_supabase_logs(supabase, lead, template, success, error_msg)
 
             if success:
                 sent += 1
-                logger.info(f"  ✅ [{i+1}/{len(batch)}] Sent to {lead['email']}")
+                logger.info(f"  ✅ [{i+1}/{len(leads)}] Sent to {lead['email']}")
             else:
                 failed += 1
-                logger.warning(f"  ❌ [{i+1}/{len(batch)}] Failed: {lead['email']}")
+                logger.warning(f"  ❌ [{i+1}/{len(leads)}] Failed: {lead['email']}")
 
-        # Rate limiting: random delay between 45-90 seconds
-        if i < len(batch) - 1 and not dry_run:
+        # Rate limiting: strictly 45-90 seconds between sends
+        if i < len(leads) - 1 and not dry_run:
             delay = random.randint(45, 90)
-            logger.info(f"  ⏳ Waiting {delay}s before next send...")
+            logger.info(f"  ⏳ Rate Limit: Waiting {delay}s before next send...")
             time.sleep(delay)
 
-    result = {
-        "success": True,
-        "sent": sent,
-        "failed": failed,
-        "total": len(batch),
-        "template": template,
-        "logFile": log_file,
-    }
-    print(json.dumps(result, indent=2))
-    return result
+    if not dry_run:
+        update_kpi_tracker(supabase, sent)
 
+    logger.info(f"--- Campaign Summary ---")
+    logger.info(f"Sent   : {sent}")
+    logger.info(f"Failed : {failed}")
 
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Send personalized cold emails")
-    parser.add_argument("--leads", default="execution/leads.csv", help="Path to leads CSV")
+def main():
+    parser = argparse.ArgumentParser(description="Send personalized cold emails via Supabase leads")
     parser.add_argument("--template", default="cold_intro", choices=list(TEMPLATES.keys()), help="Email template")
-    parser.add_argument("--daily_cap", type=int, default=10, help="Max emails per run (default: 10)")
+    parser.add_argument("--daily_cap", type=int, default=10, help="Max emails per run")
     parser.add_argument("--dry_run", action="store_true", help="Preview without sending")
 
     args = parser.parse_args()
-    send_cold_emails(args.leads, args.template, args.daily_cap, args.dry_run)
-
+    send_cold_emails(args.template, args.daily_cap, args.dry_run)
 
 if __name__ == "__main__":
     main()
