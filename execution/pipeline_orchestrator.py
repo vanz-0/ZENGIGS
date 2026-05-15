@@ -34,13 +34,14 @@ def run_script(script_name: str, args: list) -> bool:
         logger.error(f"Error output:\n{e.stderr}")
         return False
 
-def run_scrape(query: str, location: str, max_items: int):
+def run_scrape(query: str, location: str, max_items: int, mode: str):
     """Run the scraping and normalization pipeline."""
-    logger.info("=== Starting Scrape Pipeline ===")
+    logger.info(f"=== Starting Scrape Pipeline (Mode: {mode}) ===")
     args = [
         "--query", query,
         "--location", location,
-        "--max_items", str(max_items)
+        "--max_items", str(max_items),
+        "--mode", mode
     ]
     success = run_script("scrape_leads.py", args)
     if success:
@@ -72,6 +73,7 @@ def main():
     parser.add_argument("--query", help="Search query for scrape")
     parser.add_argument("--location", help="Location for scrape")
     parser.add_argument("--max_items", type=int, default=50, help="Max leads to scrape")
+    parser.add_argument("--mode", choices=["test", "active"], default="active", help="Scrape mode")
     
     # Outreach args
     parser.add_argument("--template", default="cold_intro", help="Email template")
@@ -84,7 +86,7 @@ def main():
         if not args.query or not args.location:
             logger.error("--query and --location are required for scraping.")
             sys.exit(1)
-        run_scrape(args.query, args.location, args.max_items)
+        run_scrape(args.query, args.location, args.max_items, args.mode)
         
     if args.action in ["outreach", "full"]:
         run_outreach(args.template, args.daily_cap, args.dry_run)

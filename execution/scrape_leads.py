@@ -49,6 +49,7 @@ class ScrapeConfig:
     query: str
     location: str
     max_items: int = 50
+    mode: str = "active"
     require_email: bool = True
     job_titles: Optional[List[str]] = None
     company_keywords: Optional[List[str]] = None
@@ -190,6 +191,7 @@ def main() -> None:
     parser.add_argument("--query", required=True, help="Search query (e.g., 'SaaS Founders')")
     parser.add_argument("--location", required=True, help="Location (e.g., 'United States')")
     parser.add_argument("--max_items", type=int, default=50, help="Max leads to scrape")
+    parser.add_argument("--mode", choices=["test", "active"], default="active", help="Scrape mode: 'test' (1 lead) or 'active' (batch)")
     parser.add_argument("--no-email-filter", action="store_true", help="Don't filter by validated emails")
 
     args = parser.parse_args()
@@ -198,7 +200,8 @@ def main() -> None:
         config = ScrapeConfig(
             query=args.query,
             location=args.location,
-            max_items=args.max_items,
+            max_items=1 if args.mode == "test" else args.max_items,
+            mode=args.mode,
             require_email=not args.no_email_filter,
         )
     except ValueError as e:
