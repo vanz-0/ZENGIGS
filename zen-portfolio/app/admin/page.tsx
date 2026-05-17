@@ -17,6 +17,13 @@ export default function AdminPage() {
 
   useEffect(() => {
     async function checkAuth() {
+      // Localhost Admin Bypass
+      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
+        setAuthenticated(true);
+        setLoading(false);
+        return;
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         router.push('/login');

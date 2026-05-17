@@ -66,7 +66,7 @@ export function LeadCenter() {
   async function fetchLeads() {
     setLoading(true);
     const { data, error } = await supabase
-      .table('leads')
+      .from('leads')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(10);
@@ -107,8 +107,8 @@ export function LeadCenter() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-4xl font-bold text-white tracking-tight">Lead Center</h1>
-          <p className="text-gray-400 mt-2 font-mono">ZENGIGS Automation Command Center</p>
+          <h1 className="text-4xl font-bold text-foreground tracking-tight">Lead Center</h1>
+          <p className="text-muted-foreground mt-2 font-mono">ZENGIGS Automation Command Center</p>
         </div>
         <div className="flex items-center gap-4">
           <div className="px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full flex items-center gap-2">
@@ -128,39 +128,39 @@ export function LeadCenter() {
 
           <div className="space-y-6">
             <div>
-              <label className="text-xs font-mono text-gray-500 block mb-2">TARGET NICHE</label>
+              <label className="text-xs font-mono text-muted-foreground block mb-2">TARGET NICHE</label>
               <select 
                 value={niche} 
                 onChange={(e) => setNiche(e.target.value)}
-                className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary transition-colors"
               >
                 {NICHES.map(n => <option key={n} value={n}>{n}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="text-xs font-mono text-gray-500 block mb-2">LOCATION</label>
+              <label className="text-xs font-mono text-muted-foreground block mb-2">LOCATION</label>
               <select 
                 value={location} 
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors"
+                className="w-full bg-black border border-white/20 rounded-xl px-4 py-3 text-foreground focus:outline-none focus:border-primary transition-colors"
               >
                 {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
               </select>
             </div>
 
             <div>
-              <label className="text-xs font-mono text-gray-500 block mb-2">SCRAPE MODE</label>
+              <label className="text-xs font-mono text-muted-foreground block mb-2">SCRAPE MODE</label>
               <div className="grid grid-cols-2 gap-2 p-1 bg-black rounded-xl border border-white/10">
                 <button 
                   onClick={() => setMode("test")}
-                  className={`py-2 text-xs font-bold rounded-lg transition-all ${mode === "test" ? "bg-primary text-white" : "text-gray-500 hover:text-white"}`}
+                  className={`py-2 text-xs font-bold rounded-lg transition-all ${mode === "test" ? "bg-primary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   TEST (1 Lead)
                 </button>
                 <button 
                   onClick={() => setMode("active")}
-                  className={`py-2 text-xs font-bold rounded-lg transition-all ${mode === "active" ? "bg-primary text-white" : "text-gray-500 hover:text-white"}`}
+                  className={`py-2 text-xs font-bold rounded-lg transition-all ${mode === "active" ? "bg-primary text-foreground" : "text-muted-foreground hover:text-foreground"}`}
                 >
                   ACTIVE (Batch)
                 </button>
@@ -170,7 +170,7 @@ export function LeadCenter() {
             <button 
               onClick={startPipeline}
               disabled={running}
-              className="w-full bg-white text-black font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary hover:text-white transition-all disabled:opacity-50 group"
+              className="w-full bg-white text-background font-bold py-4 rounded-xl flex items-center justify-center gap-2 hover:bg-primary hover:text-foreground transition-all disabled:opacity-50 group"
             >
               {running ? <RefreshCw className="animate-spin" /> : <Play fill="currentColor" size={20} />}
               {running ? "SCRAPING..." : "START PIPELINE"}
@@ -185,7 +185,7 @@ export function LeadCenter() {
               <Users size={20} />
               <h2 className="font-bold uppercase tracking-widest text-sm">Recent Leads</h2>
             </div>
-            <button onClick={fetchLeads} className="text-gray-400 hover:text-white transition-colors">
+            <button onClick={fetchLeads} className="text-muted-foreground hover:text-foreground transition-colors">
               <RefreshCw size={16} />
             </button>
           </div>
@@ -193,7 +193,7 @@ export function LeadCenter() {
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-white/5 text-[10px] font-mono text-gray-500 uppercase">
+                <tr className="bg-white/5 text-[10px] font-mono text-muted-foreground uppercase">
                   <th className="px-6 py-4">Lead</th>
                   <th className="px-6 py-4">Company</th>
                   <th className="px-6 py-4">Niche</th>
@@ -204,17 +204,17 @@ export function LeadCenter() {
                 {leads.map((lead) => (
                   <tr key={lead.id} className="hover:bg-white/[0.02] transition-colors group">
                     <td className="px-6 py-4">
-                      <div className="font-bold text-white text-sm">{lead.first_name} {lead.last_name}</div>
-                      <div className="text-xs text-gray-500">{lead.email}</div>
+                      <div className="font-bold text-foreground text-sm">{lead.first_name} {lead.last_name}</div>
+                      <div className="text-xs text-muted-foreground">{lead.email}</div>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="text-sm text-gray-300">{lead.company}</div>
+                      <div className="text-sm text-foreground">{lead.company}</div>
                       <a href={lead.website} target="_blank" className="text-[10px] text-primary flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                         <ExternalLink size={10} /> Visit Site
                       </a>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="text-[10px] font-mono px-2 py-1 bg-white/10 rounded-full text-gray-400 border border-white/10">
+                      <span className="text-[10px] font-mono px-2 py-1 bg-white/10 rounded-full text-muted-foreground border border-white/10">
                         {lead.niche}
                       </span>
                     </td>
@@ -224,7 +224,7 @@ export function LeadCenter() {
                           <CheckCircle2 size={14} /> NEW
                         </div>
                       ) : (
-                        <div className="flex items-center justify-end gap-1 text-gray-500 text-xs">
+                        <div className="flex items-center justify-end gap-1 text-muted-foreground text-xs">
                           <AlertCircle size={14} /> {lead.status.toUpperCase()}
                         </div>
                       )}
@@ -233,7 +233,7 @@ export function LeadCenter() {
                 ))}
                 {leads.length === 0 && !loading && (
                   <tr>
-                    <td colSpan={4} className="px-6 py-12 text-center text-gray-500 font-mono text-sm">
+                    <td colSpan={4} className="px-6 py-12 text-center text-muted-foreground font-mono text-sm">
                       No leads found. Start a pipeline to populate this list.
                     </td>
                   </tr>
