@@ -4,8 +4,10 @@ import { BentoGrid } from "@/components/BentoGrid";
 import { CorePillars } from "@/components/CorePillars";
 import { MinimalFooter } from "@/components/Footer";
 import { LiveMetrics } from "@/components/LiveMetrics";
-import { LeadGateModal } from "@/components/LeadGateModal";
+import { ClientShowcase } from "@/components/ClientShowcase";
+import { Process } from "@/components/Process";
 
+import { PaymentOptions } from "@/components/PaymentOptions";
 export default function Home() {
   return (
     <main className="min-h-screen bg-background relative overflow-hidden">
@@ -24,14 +26,20 @@ export default function Home() {
         <CorePillars />
       </div>
 
+      <ClientShowcase />
+
+      <Process />
+
       <div id="metrics">
         <LiveMetrics />
       </div>
 
+
+      <div id="payments">
+        <PaymentOptions />
+      </div>
       <MinimalFooter />
 
-      {/* Global Modal Gate triggered by interactive elements */}
-      <LeadGateModal />
     </main>
   );
 }

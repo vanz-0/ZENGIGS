@@ -11,7 +11,7 @@ interface Project {
   image_url: string;
   tech_stack: string[];
   live_link: string;
-  results: string;
+  results_metric: string;
 }
 
 export function PortfolioGallery() {
@@ -87,7 +87,7 @@ export function PortfolioGallery() {
               {/* Results & Link */}
               <div className="flex items-center justify-between mt-auto pt-4 border-t border-white/10">
                 <div className="text-xs font-bold text-primary max-w-[70%] truncate">
-                  {project.results}
+                  {project.results_metric}
                 </div>
                 {project.live_link && (
                   <a 

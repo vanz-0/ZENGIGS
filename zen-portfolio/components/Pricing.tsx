@@ -142,7 +142,7 @@ export function Pricing() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto px-4 relative z-10">
 
-        {/* Starter Pack */}
+        {/* Standard Pack */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -151,29 +151,29 @@ export function Pricing() {
         >
           <Card>
             <Header>
-              <PlanName>Starter Pack</PlanName>
+              <PlanName>Standard Rate</PlanName>
               <Price>
-                <MainPrice>$480</MainPrice>
-                <Period>/mo</Period>
+                <MainPrice>$200</MainPrice>
+                <Period>/project</Period>
               </Price>
-              <Description>Perfect for solopreneurs needing baseline operational support.</Description>
+              <Description>Perfect for foundational setup and essential optimizations.</Description>
             </Header>
             <div className="mx-7 border-t border-white/[0.06]" />
             <Body>
               <List>
-                <ListItem>20 Hours per month</ListItem>
-                <ListItem>Basic Inbox Management</ListItem>
-                <ListItem>Weekly Social Media Scheduling</ListItem>
-                <ListItem>Light Data Entry & CRM Admin</ListItem>
+                <ListItem>Basic Workflow Automation</ListItem>
+                <ListItem>Landing Page or Single System Setup</ListItem>
+                <ListItem>Initial SEO & Copywriting</ListItem>
+                <ListItem>1 Revision Round</ListItem>
               </List>
               <div className="mt-8 flex justify-center">
-                <InteractiveHoverButton text="Get Started" className="w-full" />
+                <InteractiveHoverButton text="Start Standard" className="w-full" />
               </div>
             </Body>
           </Card>
         </motion.div>
 
-        {/* Growth Pack (Popular) */}
+        {/* Optimum Pack (Popular) */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -184,25 +184,25 @@ export function Pricing() {
             <div className="absolute -top-[1px] inset-x-0 flex justify-center z-10">
               <span className="bg-gradient-to-r from-primary to-accent text-white text-[10px] font-mono font-bold px-4 py-1.5 rounded-b-xl uppercase tracking-[0.2em] flex items-center gap-1.5">
                 <Sparkles className="w-3 h-3" />
-                Most Popular
+                Optimum Level
               </span>
             </div>
             <Header className="pt-10">
-              <PlanName className="text-primary">Growth Pack</PlanName>
+              <PlanName className="text-primary">Optimum Rate</PlanName>
               <Price>
-                <MainPrice className="text-gradient">$940</MainPrice>
-                <Period>/mo</Period>
+                <MainPrice className="text-gradient">$500</MainPrice>
+                <Period>/project</Period>
               </Price>
-              <Description>For growing teams needing advanced automation and media production.</Description>
+              <Description>For growing businesses needing comprehensive AI integration.</Description>
             </Header>
             <div className="mx-7 border-t border-primary/10" />
             <Body>
               <List>
-                <ListItem featured>40 Hours per month</ListItem>
-                <ListItem featured>Advanced Zapier/Make Automation</ListItem>
-                <ListItem featured>Short-form Video Editing (TikTok/Reels)</ListItem>
-                <ListItem featured>Proactive Lead Generation</ListItem>
-                <ListItem featured>Weekly Strategy Calls</ListItem>
+                <ListItem featured>Complex Make.com / Zapier Flows</ListItem>
+                <ListItem featured>Multi-page Web Development</ListItem>
+                <ListItem featured>Full Ads & Media Production Setup</ListItem>
+                <ListItem featured>Advanced Data Management (Airtable)</ListItem>
+                <ListItem featured>Priority Support</ListItem>
               </List>
               <div className="mt-8 flex justify-center">
                 <InteractiveHoverButton text="Scale Now" className="w-full !bg-primary border-primary/50" />
@@ -220,21 +220,21 @@ export function Pricing() {
         >
           <Card>
             <Header>
-              <PlanName>Premium 24/7</PlanName>
+              <PlanName>Premium Level</PlanName>
               <Price>
-                <MainPrice>$1,800</MainPrice>
-                <Period>/mo</Period>
+                <MainPrice>$700</MainPrice>
+                <Period>/project</Period>
               </Price>
-              <Description>Institutional-grade support for established businesses.</Description>
+              <Description>Institutional-grade AI Operating System setup.</Description>
             </Header>
             <div className="mx-7 border-t border-white/[0.06]" />
             <Body>
               <List>
-                <ListItem>80 Hours per month</ListItem>
-                <ListItem>Dedicated 24/7 Availability</ListItem>
-                <ListItem>Full Social Media Strategy & Production</ListItem>
-                <ListItem>Custom AI Chatbot Integration</ListItem>
-                <ListItem>End-to-end Project Management</ListItem>
+                <ListItem>Self-hosted AI (Bolt.diy) Setup</ListItem>
+                <ListItem>Custom Enterprise Chatbots</ListItem>
+                <ListItem>End-to-End Funnel Architecture</ListItem>
+                <ListItem>Dedicated Planning & Consultation</ListItem>
+                <ListItem>Long-term Maintenance Plan</ListItem>
               </List>
               <div className="mt-8 flex justify-center">
                 <InteractiveHoverButton text="Go Premium" className="w-full" />

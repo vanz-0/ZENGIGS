@@ -108,7 +108,7 @@ def normalize_and_save(results: List[Dict], query: str) -> Dict[str, Any]:
             "platform": "Upwork",
             "job_title": job_title[:255],
             "status": "scraped",
-            "date_applied": datetime.now().isoformat(),
+            "applied_at": datetime.now().isoformat(),
             "link": link,
         })
 

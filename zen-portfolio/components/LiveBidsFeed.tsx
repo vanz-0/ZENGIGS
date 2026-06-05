@@ -10,7 +10,7 @@ interface Bid {
   platform: string;
   job_title: string;
   status: string;
-  date_applied: string;
+  applied_at: string;
   link: string;
 }
 
@@ -23,7 +23,7 @@ export function LiveBidsFeed() {
       const { data, error } = await supabase
         .from("active_bids")
         .select("*")
-        .order("date_applied", { ascending: false });
+        .order("applied_at", { ascending: false });
 
       if (!error && data) {
         setBids(data);
@@ -107,7 +107,7 @@ export function LiveBidsFeed() {
                   <div className="min-w-0">
                     <p className="text-foreground font-bold truncate pr-4">{bid.job_title}</p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                      <span>{new Date(bid.date_applied).toLocaleDateString()}</span>
+                      <span>{new Date(bid.applied_at).toLocaleDateString()}</span>
                       <span className="uppercase text-primary/80">{bid.platform}</span>
                     </div>
                   </div>

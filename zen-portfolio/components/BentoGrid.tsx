@@ -4,8 +4,8 @@ import { cn } from "@/lib/utils";
 import {
   Settings,
   Calendar,
-  Video,
-  MessageSquare,
+  Megaphone,
+  Code,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -19,6 +19,7 @@ export interface BentoItem {
   colSpan?: number;
   hasPersistentHover?: boolean;
   gradient?: string;
+  bgImage?: string;
 }
 
 const itemsSample: BentoItem[] = [
@@ -33,33 +34,37 @@ const itemsSample: BentoItem[] = [
     colSpan: 2,
     hasPersistentHover: true,
     gradient: "from-violet-500/20 via-purple-500/10 to-transparent",
+    bgImage: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?q=80&w=1000&auto=format&fit=crop",
   },
   {
-    title: "Social Media Strategy",
-    meta: "Multi-platform",
-    description: "Content calendar creation, scheduling, and engagement management across all channels.",
-    icon: <Calendar className="w-5 h-5" />,
+    title: "Ads & Media Production",
+    meta: "Targeted Campaigns",
+    description: "High-converting ad campaigns, short & long-form video editing, thumbnails, brand kits, and everything visual.",
+    icon: <Megaphone className="w-5 h-5" />,
     status: "Growth",
-    tags: ["Strategy", "Content"],
+    tags: ["Ads", "Video", "ROI"],
     gradient: "from-blue-500/20 via-cyan-500/10 to-transparent",
+    bgImage: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1000&auto=format&fit=crop",
   },
   {
-    title: "Media Production",
-    meta: "Premiere & Canva",
-    description: "Short & long-form video editing, thumbnails, brand kits, and everything visual.",
-    icon: <Video className="w-5 h-5" />,
-    tags: ["Video", "Design"],
-    colSpan: 2,
+    title: "Web Development",
+    meta: "Modern Architectures",
+    description: "Building responsive, high-performance web applications, sites, and landing pages tailored to your brand.",
+    icon: <Code className="w-5 h-5" />,
+    tags: ["Web", "Design", "Dev"],
     gradient: "from-fuchsia-500/20 via-pink-500/10 to-transparent",
+    bgImage: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?q=80&w=1000&auto=format&fit=crop",
   },
   {
-    title: "Customer Support",
-    meta: "24/7 Coverage",
-    description: "Email management, CRM tracking, and inbound lead qualification around the clock.",
-    icon: <MessageSquare className="w-5 h-5" />,
+    title: "Email Marketing & More",
+    meta: "Comprehensive Gigs",
+    description: "Strategic email marketing, CRM tracking, newsletter management, and end-to-end digital solutions.",
+    icon: <Calendar className="w-5 h-5" />,
     status: "Active",
-    tags: ["Admin", "Inbox"],
+    tags: ["Email", "CRM", "Solutions"],
+    colSpan: 2,
     gradient: "from-emerald-500/20 via-green-500/10 to-transparent",
+    bgImage: "https://images.unsplash.com/photo-1563986768494-4dee2763ff3f?q=80&w=1000&auto=format&fit=crop",
   },
 ];
 
@@ -112,10 +117,22 @@ export function BentoGrid({ items = itemsSample }: BentoGridProps) {
               }
             )}
           >
+            {/* Background Image if exists */}
+            {item.bgImage && (
+              <div className="absolute inset-0 overflow-hidden z-0">
+                <img 
+                  src={item.bgImage} 
+                  alt={item.title} 
+                  className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700 opacity-20 group-hover:opacity-40"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/20" />
+              </div>
+            )}
+
             {/* Hover gradient overlay */}
             <div
               className={cn(
-                "absolute inset-0 bg-gradient-to-br transition-opacity duration-500",
+                "absolute inset-0 bg-gradient-to-br transition-opacity duration-500 z-0",
                 item.gradient || "from-primary/10 to-transparent",
                 item.hasPersistentHover
                   ? "opacity-100"
@@ -124,8 +141,8 @@ export function BentoGrid({ items = itemsSample }: BentoGridProps) {
             />
 
             {/* Content */}
-            <div className="relative flex flex-col h-full justify-between space-y-5">
-              <div>
+            <div className="relative z-10 flex flex-col h-full justify-between space-y-5 pointer-events-none">
+              <div className="pointer-events-auto">
                 <div className="flex items-center justify-between mb-5">
                   <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary/20 group-hover:scale-110 transition-all duration-300">
                     {item.icon}
