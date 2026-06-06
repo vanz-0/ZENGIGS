@@ -51,6 +51,7 @@ class SMTPConfig:
     email: str
     password: str
     sender_name: str
+    sender_email: str
 
     @classmethod
     def from_env(cls) -> 'SMTPConfig':
@@ -59,11 +60,12 @@ class SMTPConfig:
         email = os.getenv("SMTP_EMAIL")
         password = os.getenv("SMTP_PASSWORD")
         sender_name = os.getenv("SENDER_NAME", "ZENGIGS")
+        sender_email = os.getenv("SENDER_EMAIL") or email
 
         if not all([host, email, password]):
             raise ValueError("Missing SMTP credentials in .env")
 
-        return cls(host=host, port=port, email=email, password=password, sender_name=sender_name)
+        return cls(host=host, port=port, email=email, password=password, sender_name=sender_name, sender_email=sender_email)
 
 # ─── Supabase Client ──────────────────────────────────────────────────────────
 
@@ -77,44 +79,75 @@ def get_supabase_client() -> Optional[Client]:
 # ─── Email Templates ─────────────────────────────────────────────────────────
 
 TEMPLATES = {
-    "cold_intro": {
-        "subject": "Quick question about {company}",
-        "body": """Hi {first_name},
-
-I noticed {company} is growing fast — congrats on that.
-
-I help founders like you save 20+ hours a week by handling the stuff that doesn't need to be you: inbox management, social media scheduling, AI workflow setup, and video editing.
-
-Would a 15-minute call this week make sense to see if I can help?
-
-Best,
-{sender_name}
-ZENGIGS | Tech-Powered Virtual Assistant"""
+    # VERSION 1: Curiosity / Second Brain
+    "intro_v1": {
+        "subject": "{first_name} AI - are you using yours?",
+        "body": "Hi {first_name}, are you currently using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems)?\n\n{sender_name}\n\nSent from my iPhone"
     },
-    "follow_up": {
-        "subject": "Re: Quick question about {company}",
-        "body": """Hi {first_name},
-
-Just bumping this up — I know inboxes get buried.
-
-I recently helped a founder in your space automate their content pipeline, saving them 15 hours/week. Happy to share how.
-
-Worth a quick chat?
-
-{sender_name}"""
+    "explanation_v1": {
+        "subject": "Re: {first_name} AI - are you using yours?",
+        "body": "Hi {first_name},\n\nThanks for sharing that — it actually helps a lot.\n\nBased on what you do, I can build you a 24/7 AI that handles your workflow the way YOU would handle it. It learns your tone, your rules, your standards. Runs while you sleep. Doesn't need managing.\n\nZero coding on your end. Zero disruption to what's already working.\n\nIt's basically a second brain that reports to you like a loyal employee — except it's always on, always consistent, and never makes excuses.\n\nWould you want to explore setting this up specifically for your business?\n\n{sender_name}"
     },
-    "value_bomb": {
-        "subject": "Free resource for {company}",
-        "body": """Hi {first_name},
-
-I put together a quick checklist of the top 5 tasks founders should delegate first to save 10+ hours/week. Thought it might be useful for you.
-
-No strings attached — just reply "send it" and I'll share the link.
-
-Cheers,
-{sender_name}
-ZENGIGS"""
+    "proposal_v1": {
+        "subject": "Re: {first_name} AI - are you using yours?",
+        "body": "Hi {first_name},\n\nPerfect. I've already got a rough blueprint in my head based on what you shared.\n\nI'm free anytime between 4 PM and 9 PM US time on Thursday and Friday. Just reply with what works for you and we'll map it out. No prep needed on your end.\n\n{sender_name}"
     },
+
+    # VERSION 2: FOMO / Competitors
+    "intro_v2": {
+        "subject": "Your competitors just got an AI employee",
+        "body": "Hi {first_name}, quick question — have you started using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems) yet?\n\n{sender_name}\n\nSent from my iPhone"
+    },
+    "explanation_v2": {
+        "subject": "Re: Your competitors just got an AI employee",
+        "body": "Hi {first_name},\n\nReally appreciate you sharing the context.\n\nHere's the honest picture: the businesses pulling ahead in your space right now are running lean AI systems that handle repetitive, time-consuming work in the background 24/7 — on autopilot, according to their exact instructions.\n\nI can set that up for you. Custom to your business. No coding. No interference with how you currently work.\n\nOne question: would you be open to building your own personalized AI if it meant getting back 10+ hours a week?\n\n{sender_name}"
+    },
+    "proposal_v2": {
+        "subject": "Re: Your competitors just got an AI employee",
+        "body": "Hi {first_name},\n\nGlad to hear you're ready to take the lead.\n\nI have a custom outline ready that shows exactly how we'd set up your AI advantage. Let's get on a quick call — I'm free anytime between 4 PM and 9 PM US time on Thursday and Friday. Which works for you?\n\n{sender_name}"
+    },
+
+    # VERSION 3: Problem Fixing / Money on the Table
+    "intro_v3": {
+        "subject": "{first_name}, you're leaving money on the table",
+        "body": "Hi {first_name}, wondering if you are using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems) in your workflow?\n\n{sender_name}\n\nSent from my iPhone"
+    },
+    "explanation_v3": {
+        "subject": "Re: {first_name}, you're leaving money on the table",
+        "body": "Hi {first_name},\n\nThanks for the context.\n\nBased on what you shared, I can build you a 24/7 AI that handles your specific workflow exactly how you'd handle it yourself — your tone, your rules, your standards. Runs while you sleep. Zero coding on your end.\n\nDo you want to work on setting this up to plug those leaks and get your time back?\n\n{sender_name}"
+    },
+    "proposal_v3": {
+        "subject": "Re: {first_name}, you're leaving money on the table",
+        "body": "Hi {first_name},\n\nGreat. I've mapped out a quick proposal based on what you shared — exactly what your AI would handle and what you'd see in week one.\n\nLet's hop on a 15-minute call this week. I'm free anytime between 4 PM and 9 PM US time on Tuesday and Wednesday. What works?\n\n{sender_name}"
+    },
+
+    # VERSION 4: Urgency / Market Shift
+    "intro_v4": {
+        "subject": "Act fast: AI is reshaping your market",
+        "body": "Hi {first_name}, are you currently using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems) for your business?\n\n{sender_name}\n\nSent from my iPhone"
+    },
+    "explanation_v4": {
+        "subject": "Re: Act fast: AI is reshaping your market",
+        "body": "Hi {first_name},\n\nThanks for the details.\n\nTo get you ahead of this, I can build a 24/7 AI that integrates directly into your current workflow. It learns your process daily, stays completely secure, and requires zero coding from you.\n\nWould you be open to building your own personalized AI before your market shifts further?\n\n{sender_name}"
+    },
+    "proposal_v4": {
+        "subject": "Re: Act fast: AI is reshaping your market",
+        "body": "Hi {first_name},\n\nExcellent. I put together a quick outline of exactly how your AI setup would work.\n\nI'm free anytime between 4 PM and 9 PM US time on Wednesday and Thursday — happy to walk you through it. Which works?\n\n{sender_name}"
+    },
+
+    # VERSION 5: Free Test / Low Risk
+    "intro_v5": {
+        "subject": "your Free AI OS setup !!!",
+        "body": "Hi {first_name}, just wanted to ask if you are using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems) right now?\n\n{sender_name}\n\nSent from my iPhone"
+    },
+    "explanation_v5": {
+        "subject": "Re: your Free AI OS setup !!!",
+        "body": "Appreciate the quick reply {first_name}.\n\nI'm actually doing a free AI test for a few businesses right now. It's a 24/7 AI that just runs quietly in the background, learns your exact process, and only does what you tell it to.\n\nZero code. Zero disruption to your current tools. Just a risk-free test.\n\nBefore we get into it, what industry are you in? And are you using an AI OS right now?\n\n{sender_name}"
+    },
+    "proposal_v5": {
+        "subject": "Re: your Free AI OS setup !!!",
+        "body": "Awesome {first_name}.\n\nI have an exciting proposal ready that details how we can seamlessly implement this solution for you, ensuring your workflow remains uninterrupted.\n\nI’d love to discuss this further during a quick call. I'm available between 4 PM and 9 PM US time on Monday and Tuesday. What time suits you best?\n\n{sender_name}"
+    }
 }
 
 # ─── Core Functions ───────────────────────────────────────────────────────────
@@ -139,7 +172,22 @@ def personalize_email(template_name: str, lead: Dict, sender_name: str) -> Optio
     if not template:
         return None
 
-    first_name = lead.get("first_name") or "there"
+    first_name = lead.get("first_name")
+    if not first_name or first_name.lower() == "there":
+        # Fallback: Generate from email
+        email_str = lead.get("email", "")
+        if "@" in email_str:
+            prefix = email_str.split("@")[0]
+            # Try to get something name-like
+            clean_prefix = ''.join(c for c in prefix if c.isalpha() or c == '.')
+            if '.' in clean_prefix:
+                first_name = clean_prefix.split('.')[0]
+            else:
+                first_name = clean_prefix
+        
+        if not first_name:
+            first_name = "there"
+
     company = lead.get("company") or "your company"
 
     placeholders = {
@@ -155,7 +203,7 @@ def personalize_email(template_name: str, lead: Dict, sender_name: str) -> Optio
 
 def send_email(smtp_config: SMTPConfig, to_email: str, subject: str, body: str) -> bool:
     msg = MIMEMultipart()
-    msg["From"] = f"{smtp_config.sender_name} <{smtp_config.email}>"
+    msg["From"] = f"{smtp_config.sender_name} <{smtp_config.sender_email}>"
     msg["To"] = to_email
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))

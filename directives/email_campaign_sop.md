@@ -1,30 +1,28 @@
-# Cold Email Campaign Standard Operating Procedure (SOP)
+# Cold Email Campaign SOP: Two-Tier Architecture
 
 ## Goal
-Automate the daily process of verifying raw email lists, removing invalid/risky emails, and scheduling 100-200 outreach emails across multiple sender accounts targeting the US market.
+Execute a two-tier outreach strategy to protect core domain reputation. Use a bulk-friendly ESP (Brevo) for initial icebreakers, and a high-deliverability ESP (Resend) for delivering core offers and free trials ONLY to leads who respond.
 
-## Inputs
-*   Raw list of emails (placed in `.tmp/raw_emails.csv`).
-*   Configured API keys for Verification Service (e.g., ZeroBounce) in `.env`.
-*   Configured API keys for Outreach Tool (e.g., Instantly/Smartlead) in `.env`.
+## Process Flow
 
-## Process
+### Phase 1: Local Email Verification
+*   **Tool:** `execution/free_email_verifier.py`
+*   **Input:** Place raw leads in `.tmp/raw_emails.txt`.
+*   **Action:** Runs syntax and DNS MX checks locally.
+*   **Output:** Generates `.tmp/free_verified_emails.csv`.
 
-1.  **Verification Phase (`execution/verify_emails.py`)**
-    *   **Trigger:** Daily at 02:00 AM (or via manual run).
-    *   **Action:** Reads `.tmp/raw_emails.csv`. Iterates through emails and pings the Verification API.
-    *   **Output:** Generates `.tmp/verified_emails.csv` containing only "valid" and "safe-to-send" addresses. Invalid/catch-all emails are discarded or logged separately.
+### Phase 2: Tier 1 - The Icebreaker (Brevo)
+*   **Tool:** `execution/send_campaign.py` (Adapted for Brevo/Instantly)
+*   **Input:** `.tmp/free_verified_emails.csv`
+*   **Action:** Sends one of the 5 curiosity-invoking icebreaker variations. No links, no heavy HTML.
+*   **Outcome:** If no reply, leave them alone. Do NOT send the core offer.
 
-2.  **Outreach Injection Phase (`execution/send_campaign.py`)**
-    *   **Trigger:** Following the completion of the Verification Phase.
-    *   **Action:** Reads `.tmp/verified_emails.csv`. Selects the daily batch (100-200 emails). Injects these leads into the active campaign in the Outreach Tool.
-    *   **Limits:** The Outreach Tool is configured to use 4-8 sender accounts, capping each sender at 25-50 emails/day to mimic human sending patterns.
-    *   **Scheduling:** Ensures sending is confined to US business hours (EST/PST).
+### Phase 3: Tier 2 - The Core Offer (Resend)
+*   **Tool:** `execution/send_resend_offer.py`
+*   **Input:** Leads who replied positively are manually or automatically placed into `.tmp/replied_leads.csv`.
+*   **Action:** Triggers the Resend API to deliver the detailed proposition, case studies, and the free trial offer.
+*   **Safety:** Because this is only sent to engaged leads, it maintains exceptional deliverability and domain trust.
 
-3.  **Content & Offer**
-    *   The campaign sequence should include an AI-personalized icebreaker.
-    *   The core offer focuses on "Online Gigs, Virtual Events, and Global Digital Solutions" (excluding the local Kenyan market).
-
-## Handling Errors
-*   **Verification API Rate Limit/Errors:** If the API fails, the script will halt, alert via logs, and wait for human intervention or retry the next day to prevent sending unverified lists.
-*   **Outreach Tool Errors:** If injection fails, the un-injected verified emails remain in `.tmp/verified_emails.csv` for the next run.
+## Important Rules
+- **Domain Separation:** Never use the same domain for Tier 1 and Tier 2. Tier 1 should use disposable/burner domains. Tier 2 should use a trusted subdomain of your main company domain.
+- **Data Privacy:** Ensure the text files in `.tmp/` are regularly cleared after processing to protect lead data.
