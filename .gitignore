@@ -23,6 +23,10 @@ Thumbs.db
 
 # Large media files
 *.mp4
+*.wav
+
+# Generated subtitle/transcript files
+*.srt
 
 # Credentials
 token.json

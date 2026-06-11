@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 INPUT_FILE = ".tmp/free_verified_emails.csv"
 SENT_FILE = ".tmp/sent_emails.csv"
-TEMPLATE = "intro_v1"
+TEMPLATE = "master_v4"
 BATCH_SIZE = 30
 
 def send_batch():

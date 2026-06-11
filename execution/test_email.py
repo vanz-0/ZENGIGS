@@ -14,7 +14,7 @@ def run_test():
         sys.exit(1)
 
     lead = {"first_name": "Test", "company": "Test Company", "email": "Merchzenith@gmail.com"}
-    email_data = personalize_email("intro_v1", lead, smtp_config.sender_name)
+    email_data = personalize_email("master_v4", lead, smtp_config.sender_name)
     
     if not email_data:
         logger.error("Failed to generate email data.")

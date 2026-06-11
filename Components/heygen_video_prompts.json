@@ -1,0 +1,402 @@
+[
+  {
+    "title": "ZENGIGS - Lead Generation",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your business isn't booking enough sales calls, it's because of these three things. One, you're reaching out to the wrong people. Two, your messaging doesn't create urgency. And three, you have no follow-up system in place. Most businesses are leaving money on the table because they're relying on referrals and hope. That's not a strategy. My name is Evans Makau, and here at Zengigs, we guarantee you 20 booked sales appointments in 60 days — or you don't pay. No strings attached. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Live Chat Software",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If you're losing website visitors without converting them, it comes down to three things. One, no real-time engagement. Two, slow response times. And three, zero follow-up after they leave your site. A live chat widget changes that completely. It captures leads while they're still warm, answers their questions in real time, and turns browsers into buyers. My name is Evans Makau, and here at Zengigs, we'll build you a world-class live chat system at no cost — you don't pay until you land your first 10 paying clients. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Proposal Systems",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If you're sending proposals and not closing deals, it's because of three things. One, your proposals look generic. Two, they don't speak to your client's specific pain. And three, you're not creating urgency inside the document itself. A proposal should sell for you even when you're not in the room. My name is Evans Makau, and here at Zengigs, we build high-converting proposal templates that have generated over five million dollars in closed deals. We'll build yours for free. If you love it, we work together. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - SEO Audit",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your website isn't generating organic traffic, it's because of three things. One, your pages aren't optimized for the right keywords. Two, your site has technical issues you can't see. And three, you're bleeding traffic to competitors who are ranking above you. An SEO audit shows you exactly where you're losing and how to fix it. My name is Evans Makau, and here at Zengigs, we'll run a full SEO audit on your site completely free and deliver it to your inbox within 24 hours. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Google Ads",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If you're spending money on Google Ads and not seeing results, it's because of three things. One, your targeting is too broad. Two, your ad copy doesn't convert. And three, your landing page isn't optimized. You're literally burning cash every single day your ads are set up wrong. My name is Evans Makau, and here at Zengigs, we build Google Ads campaigns that guarantee 50 qualified leads in 30 days — or you don't pay a cent. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Content Writing",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your content isn't bringing in leads, it's because of three things. One, you're not writing for your audience. Two, your topics aren't SEO-optimized. And three, you're not publishing consistently enough. Content should be working for your business 24/7, not just filling up your blog. My name is Evans Makau, and here at Zengigs, we'll write you a completely free, 500-word blog post on any topic — no strings attached. Just send us a title. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - CRM Systems",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your business is losing track of leads and deals, it's because of three things. One, you don't have a proper CRM. Two, your follow-ups are inconsistent. And three, your sales pipeline has no visibility. A CRM isn't a luxury anymore — it's the backbone of every successful sales team. My name is Evans Makau, and here at Zengigs, we'll build you a world-class CRM customized to your industry at no cost. I'll pay for it myself. If you love it, we talk. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Email Marketing",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your emails aren't converting, it's because of three things. One, your subject lines aren't compelling. Two, your copy doesn't speak to pain points. And three, you have no clear call to action. Most businesses are sitting on an email list that could be printing money — but their campaigns are falling flat. My name is Evans Makau, and here at Zengigs, send me your last three email campaigns and I'll rewrite them for free — plus show you exactly why the new versions will convert better. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Social Media Management",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your social media isn't growing your business, it's because of three things. One, you're posting without a strategy. Two, your content isn't engaging your audience. And three, you're not converting followers into customers. Social media should be a revenue channel, not a vanity metric. My name is Evans Makau, and here at Zengigs, we'll manage your Instagram for 14 days completely free. If you don't see measurable growth, we part ways — no invoice, no hard feelings. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Web Design",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your website isn't converting visitors into customers, it's because of three things. One, your homepage doesn't communicate value in five seconds. Two, your design looks outdated. And three, your call to action is buried or missing. Your website is your digital storefront — and right now, it might be turning people away. My name is Evans Makau, and here at Zengigs, we'll redesign your homepage for free. You only pay if you love it. Mockup delivered within 72 hours. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Bookkeeping",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If you're losing money at tax time, it's because of three things. One, your books aren't organized. Two, you're missing deductions. And three, you don't have a system tracking your expenses in real time. Most small businesses overpay on taxes simply because their bookkeeping is reactive instead of proactive. My name is Evans Makau, and here at Zengigs, we'll do your books for an entire month at no cost. If we don't save you at least two thousand dollars in deductions, you owe us nothing. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Video Editing",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your video content isn't performing, it's because of three things. One, your editing doesn't hold attention. Two, there's no hook in the first three seconds. And three, the pacing kills your watch time. Raw footage is just raw footage — it's the editing that turns it into a marketing weapon. My name is Evans Makau, and here at Zengigs, send me your latest raw video and I'll edit it into a polished, ready-to-post piece — completely free. If you like it, we talk. If not, you keep the video. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Recruiting",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If you're struggling to find good employees, it's because of three things. One, your job postings aren't attracting the right talent. Two, you're spending too much time screening bad fits. And three, you don't have a system filtering candidates before they reach your desk. Hiring shouldn't take months. My name is Evans Makau, and here at Zengigs, we'll send you 10 pre-screened candidates for your open role in 5 business days. No fee unless you hire one. Just send us the job description. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - AI Chatbot",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your support team is drowning in repetitive questions, it's because of three things. One, your FAQ page isn't solving problems. Two, customers want instant answers, not email threads. And three, you're paying humans to answer questions a bot could handle. AI chatbots aren't the future anymore — they're the present. My name is Evans Makau, and here at Zengigs, we'll build you a custom AI chatbot that handles your top 20 FAQs. You don't pay unless it deflects at least 30% of your support tickets. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Sales Coaching",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your sales team isn't closing deals consistently, it's because of three things. One, they're not handling objections properly. Two, their pitch lacks structure. And three, nobody is reviewing their calls to find the gaps. The fix isn't more leads — it's better conversations. My name is Evans Makau, and here at Zengigs, we'll listen to three of your team's sales calls and give you a full teardown with five specific fixes — completely free. Just send me a calendar link. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  },
+  {
+    "title": "ZENGIGS - Ad Creative",
+    "video_inputs": [
+      {
+        "character": {
+          "type": "avatar",
+          "avatar_id": "YOUR_AVATAR_ID",
+          "avatar_style": "normal"
+        },
+        "voice": {
+          "type": "text",
+          "input_text": "If your ads are burning money without results, it's because of three things. One, your creative is stale. Two, you're not testing enough variations. And three, you're optimizing for the wrong metrics. Great ads aren't about bigger budgets — they're about better creative. My name is Evans Makau, and here at Zengigs, send me your best-performing ad and I'll create three new variations for free. If any of them outperform your current winner, we talk about working together. I hope to hear back from you. Thank you.",
+          "voice_id": "YOUR_VOICE_ID"
+        },
+        "background": {
+          "type": "color",
+          "value": "#0f172a"
+        }
+      }
+    ],
+    "dimension": {
+      "width": 1080,
+      "height": 1920
+    }
+  }
+]

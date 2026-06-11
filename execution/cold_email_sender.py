@@ -79,74 +79,26 @@ def get_supabase_client() -> Optional[Client]:
 # ─── Email Templates ─────────────────────────────────────────────────────────
 
 TEMPLATES = {
-    # VERSION 1: Curiosity / Second Brain
-    "intro_v1": {
-        "subject": "{first_name} AI - are you using yours?",
-        "body": "Hi {first_name}, are you currently using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems)?\n\n{sender_name}\n\nSent from my iPhone"
+    # MASTER TEMPLATES (Combined)
+    "master_v1": {
+        "subject": "you're leaving money on the table, {first_name}",
+        "body": "Hi {first_name},\n\nLet's be direct. If you aren't building your own AI operating system or running an AI-driven company in 2026, you are leaving massive amounts of money on the table.\n\nThe market has completely shifted. Traditional models are being swallowed by businesses that have automated their core workflows. Your competitors are already transitioning.\n\nI build custom AI systems and autonomous agents that run 24/7. No coding required on your end. I can build you an AI setup that immediately reclaims your time and scales your output.\n\nI want to prove it. Let me build a custom AI asset for you over the next 7 days, 100% free. If it doesn't dramatically improve your workflow, you don't pay a cent.\n\nWorth 15 minutes to see how it works? Let me know and we'll hop on a quick call.\n\nBest,\n{sender_name}"
     },
-    "explanation_v1": {
-        "subject": "Re: {first_name} AI - are you using yours?",
-        "body": "Hi {first_name},\n\nThanks for sharing that — it actually helps a lot.\n\nBased on what you do, I can build you a 24/7 AI that handles your workflow the way YOU would handle it. It learns your tone, your rules, your standards. Runs while you sleep. Doesn't need managing.\n\nZero coding on your end. Zero disruption to what's already working.\n\nIt's basically a second brain that reports to you like a loyal employee — except it's always on, always consistent, and never makes excuses.\n\nWould you want to explore setting this up specifically for your business?\n\n{sender_name}"
+    "master_v2": {
+        "subject": "quick question about 2026, {first_name}",
+        "body": "Hi {first_name},\n\nIt's 2026. If you don't have your own AI company or an AI operating system doing the heavy lifting, you're falling behind fast.\n\nI build autonomous AI systems for founders who want to scale without adding headcount. We are talking about custom AI agents that learn your rules and run your operations 24/7.\n\nYou're doing too much manual work that an AI OS could handle in seconds. I'm so confident I can fix this that I'm willing to build you a custom AI asset for free.\n\nIf it doesn't save you 10+ hours a week immediately, keep it at no cost. No strings attached.\n\nAre you open to a brief 15-minute call this week to see a live demo?\n\nCheers,\n{sender_name}"
     },
-    "proposal_v1": {
-        "subject": "Re: {first_name} AI - are you using yours?",
-        "body": "Hi {first_name},\n\nPerfect. I've already got a rough blueprint in my head based on what you shared.\n\nI'm free anytime between 4 PM and 9 PM US time on Thursday and Friday. Just reply with what works for you and we'll map it out. No prep needed on your end.\n\n{sender_name}"
+    "master_v3": {
+        "subject": "the AI shift is happening, {first_name}",
+        "body": "Hi {first_name},\n\nI'll keep this brief. We're well into 2026, and if you aren't integrating an AI OS or launching your own AI-driven solutions, you are actively losing ground to those who are.\n\nThe window to capitalize on this is closing. I help businesses transition by building them custom, autonomous AI systems that handle their repetitive workflows 24/7.\n\nI don't expect you to take my word for it. I want to build a risk-free AI asset specifically for your use case over the next few days. If you don't see immediate ROI and time saved, you pay nothing.\n\nLet's stop leaving money on the table. Are you opposed to a 15-minute chat to explore this?\n\nThanks,\n{sender_name}"
     },
-
-    # VERSION 2: FOMO / Competitors
-    "intro_v2": {
-        "subject": "Your competitors just got an AI employee",
-        "body": "Hi {first_name}, quick question — have you started using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems) yet?\n\n{sender_name}\n\nSent from my iPhone"
+    "master_v4": {
+        "subject": "you're leaving money on the table, {first_name}",
+        "body": "Hi {first_name},\n\nBy now, the reality of 2026 is clear: if you aren't operating an AI company or running your business on an AI OS, you are moving too slow.\n\nEvery day you delay, you leave money on the table while competitors automate their growth. I specialize in building custom AI systems that take over the heavy lifting so you can focus on scaling.\n\nI'm ready to prove my value upfront. Let me build a fully customized AI workflow for you in the next 7 days, completely free of charge. If it doesn't radically improve your efficiency, we part ways.\n\nDo you have 15 minutes this week to see what this looks like?\n\nBest,\n{sender_name}"
     },
-    "explanation_v2": {
-        "subject": "Re: Your competitors just got an AI employee",
-        "body": "Hi {first_name},\n\nReally appreciate you sharing the context.\n\nHere's the honest picture: the businesses pulling ahead in your space right now are running lean AI systems that handle repetitive, time-consuming work in the background 24/7 — on autopilot, according to their exact instructions.\n\nI can set that up for you. Custom to your business. No coding. No interference with how you currently work.\n\nOne question: would you be open to building your own personalized AI if it meant getting back 10+ hours a week?\n\n{sender_name}"
-    },
-    "proposal_v2": {
-        "subject": "Re: Your competitors just got an AI employee",
-        "body": "Hi {first_name},\n\nGlad to hear you're ready to take the lead.\n\nI have a custom outline ready that shows exactly how we'd set up your AI advantage. Let's get on a quick call — I'm free anytime between 4 PM and 9 PM US time on Thursday and Friday. Which works for you?\n\n{sender_name}"
-    },
-
-    # VERSION 3: Problem Fixing / Money on the Table
-    "intro_v3": {
-        "subject": "{first_name}, you're leaving money on the table",
-        "body": "Hi {first_name}, wondering if you are using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems) in your workflow?\n\n{sender_name}\n\nSent from my iPhone"
-    },
-    "explanation_v3": {
-        "subject": "Re: {first_name}, you're leaving money on the table",
-        "body": "Hi {first_name},\n\nThanks for the context.\n\nBased on what you shared, I can build you a 24/7 AI that handles your specific workflow exactly how you'd handle it yourself — your tone, your rules, your standards. Runs while you sleep. Zero coding on your end.\n\nDo you want to work on setting this up to plug those leaks and get your time back?\n\n{sender_name}"
-    },
-    "proposal_v3": {
-        "subject": "Re: {first_name}, you're leaving money on the table",
-        "body": "Hi {first_name},\n\nGreat. I've mapped out a quick proposal based on what you shared — exactly what your AI would handle and what you'd see in week one.\n\nLet's hop on a 15-minute call this week. I'm free anytime between 4 PM and 9 PM US time on Tuesday and Wednesday. What works?\n\n{sender_name}"
-    },
-
-    # VERSION 4: Urgency / Market Shift
-    "intro_v4": {
-        "subject": "Act fast: AI is reshaping your market",
-        "body": "Hi {first_name}, are you currently using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems) for your business?\n\n{sender_name}\n\nSent from my iPhone"
-    },
-    "explanation_v4": {
-        "subject": "Re: Act fast: AI is reshaping your market",
-        "body": "Hi {first_name},\n\nThanks for the details.\n\nTo get you ahead of this, I can build a 24/7 AI that integrates directly into your current workflow. It learns your process daily, stays completely secure, and requires zero coding from you.\n\nWould you be open to building your own personalized AI before your market shifts further?\n\n{sender_name}"
-    },
-    "proposal_v4": {
-        "subject": "Re: Act fast: AI is reshaping your market",
-        "body": "Hi {first_name},\n\nExcellent. I put together a quick outline of exactly how your AI setup would work.\n\nI'm free anytime between 4 PM and 9 PM US time on Wednesday and Thursday — happy to walk you through it. Which works?\n\n{sender_name}"
-    },
-
-    # VERSION 5: Free Test / Low Risk
-    "intro_v5": {
-        "subject": "your Free AI OS setup !!!",
-        "body": "Hi {first_name}, just wanted to ask if you are using AI OS (the world's current #1 top trending and revolutionized Agentic Operating Systems) right now?\n\n{sender_name}\n\nSent from my iPhone"
-    },
-    "explanation_v5": {
-        "subject": "Re: your Free AI OS setup !!!",
-        "body": "Appreciate the quick reply {first_name}.\n\nI'm actually doing a free AI test for a few businesses right now. It's a 24/7 AI that just runs quietly in the background, learns your exact process, and only does what you tell it to.\n\nZero code. Zero disruption to your current tools. Just a risk-free test.\n\nBefore we get into it, what industry are you in? And are you using an AI OS right now?\n\n{sender_name}"
-    },
-    "proposal_v5": {
-        "subject": "Re: your Free AI OS setup !!!",
-        "body": "Awesome {first_name}.\n\nI have an exciting proposal ready that details how we can seamlessly implement this solution for you, ensuring your workflow remains uninterrupted.\n\nI’d love to discuss this further during a quick call. I'm available between 4 PM and 9 PM US time on Monday and Tuesday. What time suits you best?\n\n{sender_name}"
+    "master_v5": {
+        "subject": "falling behind in 2026, {first_name}",
+        "body": "Hi {first_name},\n\nThe market is ruthless right now. If you aren't actively building an AI company or leveraging an AI OS, you are leaving serious revenue behind.\n\nYou don't need to learn how to code to catch up. I build bespoke 24/7 AI systems that plug right into your existing operations and run on autopilot.\n\nI'd love to set up a free 14-day implementation trial. I will build you a high-converting AI asset from scratch. If it doesn't immediately boost your metrics, you don't owe me a dime.\n\nLet's plug the leak in your workflow. Let me know if you're open to a casual 15-minute video call to discuss.\n\nRespectfully,\n{sender_name}"
     }
 }
 
@@ -155,7 +107,7 @@ TEMPLATES = {
 def fetch_leads(supabase: Client, template: str, daily_cap: int) -> List[Dict]:
     """Fetch leads from Supabase based on template strategy."""
     try:
-        if template == "cold_intro":
+        if template == "cold_intro" or template.startswith("master_"):
             # Fetch 'new' leads
             res = supabase.table("leads").select("*").eq("status", "new").limit(daily_cap).execute()
         else:
@@ -184,6 +136,11 @@ def personalize_email(template_name: str, lead: Dict, sender_name: str) -> Optio
                 first_name = clean_prefix.split('.')[0]
             else:
                 first_name = clean_prefix
+                
+            # Filter out generic business prefixes
+            generic_prefixes = {"info", "contact", "support", "hello", "admin", "sales", "team", "office"}
+            if first_name.lower() in generic_prefixes:
+                first_name = "there"
         
         if not first_name:
             first_name = "there"
