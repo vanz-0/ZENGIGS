@@ -150,7 +150,8 @@ def normalize_and_save(results: List[Dict], niche: str) -> Dict[str, Any]:
             "location": location,
             "niche": niche,
             "status": "new",
-            "source": "apify_scrape"
+            "source": "lead_find",
+            "campaign_id": "one_one",
         })
 
     if not normalized:

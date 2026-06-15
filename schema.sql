@@ -13,6 +13,11 @@ CREATE TABLE IF NOT EXISTS public.leads (
     website TEXT,
     location TEXT,
     niche TEXT,
+    campaign_id TEXT,
+    free_offer_text TEXT,
+    personalization_line TEXT,
+    business_summary TEXT,
+    recent_data TEXT,
     status TEXT DEFAULT 'new', -- new, enriched, contacted, bounced, replied, meeting_booked
     source TEXT DEFAULT 'apify_scrape',
     created_at TIMESTAMPTZ DEFAULT NOW(),

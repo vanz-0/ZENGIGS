@@ -38,13 +38,53 @@ export function MinimalFooter() {
           <p className="text-muted-foreground font-mono text-sm max-w-lg">
             Book a free audit call. We&apos;ll analyze your workflows, identify bottlenecks, and deliver a strategic plan.
           </p>
-          <button
-            onClick={() => window.dispatchEvent(new Event('open-lead-gate'))}
-            className="px-8 py-4 bg-primary text-primary-foreground rounded-full font-mono text-sm font-bold hover:shadow-[0_0_30px_hsla(270,95%,65%,0.4)] hover:-translate-y-1 transition-all duration-300 flex items-center gap-2"
-          >
-            Book Your Audit Call
-            <ArrowUpRight className="w-4 h-4" />
-          </button>
+          <div className="flex flex-col md:flex-row gap-8 w-full max-w-4xl mx-auto mt-6">
+            {/* Call Booking Options */}
+            <div className="flex-1 glass p-6 rounded-2xl flex flex-col items-center gap-4 border border-white/10">
+              <h4 className="font-mono font-bold text-foreground">Book a Direct Call</h4>
+              <p className="text-xs text-muted-foreground font-mono">Skip the line and speak with us directly.</p>
+              <div className="flex flex-col sm:flex-row gap-3 w-full">
+                <a
+                  href="mailto:merchzenith@gmail.com?subject=Google%20Meet%20Call%20Request"
+                  className="flex-1 py-3 bg-primary/20 text-primary rounded-xl font-mono text-sm font-bold border border-primary/30 hover:bg-primary hover:text-primary-foreground transition-all flex items-center justify-center gap-2"
+                >
+                  <ArrowUpRight className="w-4 h-4" />
+                  Google Meet
+                </a>
+                <a
+                  href="tel:+1234567890"
+                  className="flex-1 py-3 bg-white/5 text-foreground rounded-xl font-mono text-sm font-bold border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-2"
+                >
+                  <Phone className="w-4 h-4" />
+                  Phone Call
+                </a>
+              </div>
+            </div>
+
+            {/* Email Sequence Form */}
+            <div className="flex-1 glass p-6 rounded-2xl flex flex-col items-center gap-4 border border-white/10">
+              <h4 className="font-mono font-bold text-foreground">Get the Free Value Sequence</h4>
+              <p className="text-xs text-muted-foreground font-mono">Not ready for a call? Get our best strategies via email.</p>
+              <form 
+                className="w-full flex flex-col gap-2"
+                onSubmit={(e) => { e.preventDefault(); alert("Brevo API integration coming soon!"); }}
+              >
+                <input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  required
+                  className="w-full bg-black/50 border border-white/20 rounded-xl px-4 py-3 text-sm font-mono text-foreground focus:outline-none focus:border-primary transition-colors"
+                />
+                <button 
+                  type="submit"
+                  className="w-full py-3 bg-primary text-primary-foreground rounded-xl font-mono text-sm font-bold hover:shadow-[0_0_20px_hsla(270,95%,65%,0.3)] transition-all flex items-center justify-center gap-2"
+                >
+                  <Mail className="w-4 h-4" />
+                  Send Me the Guide
+                </button>
+              </form>
+            </div>
+          </div>
         </div>
       </div>
 

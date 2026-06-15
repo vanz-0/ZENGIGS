@@ -110,7 +110,8 @@ def filter_jobs(
         # Keyword filter (title + description)
         if keyword:
             text = (job.get('title', '') + ' ' + job.get('description', '')).lower()
-            if keyword.lower() not in text:
+            keywords = [k.strip().lower() for k in keyword.split(',')]
+            if not any(k in text for k in keywords):
                 continue
 
         # Budget filters

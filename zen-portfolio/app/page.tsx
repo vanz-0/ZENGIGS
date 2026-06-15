@@ -6,7 +6,7 @@ import { MinimalFooter } from "@/components/Footer";
 import { LiveMetrics } from "@/components/LiveMetrics";
 import { ClientShowcase } from "@/components/ClientShowcase";
 import { Process } from "@/components/Process";
-
+import { VideoCarousel } from "@/components/VideoCarousel";
 import { PaymentOptions } from "@/components/PaymentOptions";
 export default function Home() {
   return (
@@ -16,6 +16,10 @@ export default function Home() {
       
       <div id="hero" className="relative">
         <MynaHero />
+      </div>
+
+      <div id="video-showcase">
+        <VideoCarousel />
       </div>
 
       <div id="services">

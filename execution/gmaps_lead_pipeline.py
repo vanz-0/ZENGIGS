@@ -26,6 +26,9 @@ import gspread
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 
+# Add the execution directory to the Python path
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 # Import our modules
 from scrape_google_maps import scrape_google_maps
 from extract_website_contacts import scrape_website_contacts

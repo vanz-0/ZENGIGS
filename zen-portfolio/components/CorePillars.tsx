@@ -6,48 +6,52 @@ import { FolderArchive, Cpu, Radio, BookOpen, ArrowRight } from "lucide-react";
 
 const pillars = [
   {
-    title: "The Archive",
-    subtitle: "Work Done.",
+    title: "AI Operating System Specialists",
+    subtitle: "The Central Nervous System.",
     description:
-      "High-fidelity case studies demonstrating technical execution across automation, AI configuration, and media production. Each project features measurable ROI and real client outcomes.",
-    icon: FolderArchive,
-    href: "/hub/portfolio",
+      "We don't just add AI for the sake of it; we build a central nervous system for your business. By integrating intelligent agents and autonomous workflows, we automate repetitive decision-making, customer routing, and internal operations.",
+    icon: Cpu,
+    href: "#email-collection",
     accent: "from-violet-500/20 to-purple-600/10",
     borderAccent: "border-violet-500/30",
-    features: ["Case Studies", "Tech Stack Breakdowns", "Live Demos", "Client Results"],
+    features: ["Agentic Workflows", "Customer Routing", "Autonomous Ops", "AI Integration"],
+    ctaText: "Audit My Workflows"
   },
   {
-    title: "The Engine",
-    subtitle: "Work We Can Do.",
+    title: "Ads & Social Media Experts",
+    subtitle: "Data-Driven Growth.",
     description:
-      "A full breakdown of capabilities — from workflow automation and AI setup to content systems and virtual assistance. Everything a founder needs to scale without hiring full-time.",
-    icon: Cpu,
-    href: "/hub/services",
+      "Traffic means nothing without conversion. We architect omni-channel campaigns across Google, Meta, and emerging platforms, backed by rigorous analytics and A/B testing to ensure every dollar spent drives measurable revenue.",
+    icon: Radio,
+    href: "#book-call",
     accent: "from-blue-500/20 to-cyan-600/10",
     borderAccent: "border-blue-500/30",
-    features: ["Automation Workflows", "AI Configuration", "Media Production", "24/7 VA Support"],
+    features: ["Omni-channel Campaigns", "A/B Testing", "ROI Tracking", "Meta & Google Ads"],
+    ctaText: "Get a Free Ad Audit"
   },
   {
-    title: "Live Feed",
-    subtitle: "Active Pipeline.",
+    title: "Web & App Developers",
+    subtitle: "High-Converting Infrastructure.",
     description:
-      "A real-time, terminal-style feed tracking every active proposal across Upwork, Fiverr, PeoplePerHour, and direct outreach. Full transparency on what's in motion.",
-    icon: Radio,
-    href: "/hub/live-bids",
+      "Your digital storefront needs to be fast, secure, and intuitive. We build scalable web applications and mobile experiences using modern frameworks that not only look stunning but are engineered to convert visitors into loyal customers.",
+    icon: BookOpen,
+    href: "#services",
     accent: "from-emerald-500/20 to-green-600/10",
     borderAccent: "border-emerald-500/30",
-    features: ["Upwork Bids", "Fiverr Gigs", "Direct Outreach", "Status Tracking"],
+    features: ["Next.js & React", "Mobile Apps", "Custom UI/UX", "Secure Architecture"],
+    ctaText: "View Tech Stack"
   },
   {
-    title: "Blueprints",
-    subtitle: "The Playbook.",
+    title: "Data & Catalog Managers",
+    subtitle: "Pristine Data Architecture.",
     description:
-      "Step-by-step guides, platform breakdowns, and SOPs for freelancers scaling from zero. Covering platform selection, pricing strategy, and automation tooling.",
-    icon: BookOpen,
-    href: "/hub/blueprints",
+      "Clean data is the foundation of scale. We handle massive data entry, catalog organization, and database structuring, ensuring your inventory, CRM, and analytics platforms are always synchronized and perfectly accurate.",
+    icon: FolderArchive,
+    href: "#email-collection",
     accent: "from-amber-500/20 to-orange-600/10",
     borderAccent: "border-amber-500/30",
-    features: ["Platform Guides", "Pricing Strategy", "Automation SOPs", "Growth Playbooks"],
+    features: ["Data Entry", "Catalog Org", "Database Structuring", "CRM Sync"],
+    ctaText: "Organize My Data"
   },
 ];
 
@@ -118,13 +122,13 @@ export function CorePillars() {
                     {pillar.description}
                   </p>
 
-                  <button
-                    onClick={() => window.dispatchEvent(new Event("open-lead-gate"))}
+                  <a
+                    href={pillar.href}
                     className="inline-flex items-center gap-2 text-primary font-mono font-bold text-sm hover:gap-3 transition-all group"
                   >
-                    Unlock Access
+                    {pillar.ctaText}
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </button>
+                  </a>
                 </div>
 
                 {/* Frame Side */}

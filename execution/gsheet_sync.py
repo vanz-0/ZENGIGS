@@ -76,7 +76,7 @@ def sync_to_gsheet():
     sheet = get_google_sheet()
     
     # Prepare data for sheet
-    headers = ["id", "email", "first_name", "last_name", "company", "website", "location", "niche", "status", "source", "created_at"]
+    headers = ["id", "email", "first_name", "last_name", "company", "website", "location", "niche", "campaign_id", "free_offer_text", "business_summary", "recent_data", "personalization_line", "status", "source", "created_at"]
     rows = [headers]
     
     for lead in leads:
