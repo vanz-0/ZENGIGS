@@ -38,31 +38,31 @@ export function MynaHero() {
     {
       title: "YOUR AI OPERATING SYSTEM",
       subtitle: "We build unified digital infrastructure. From AI automations and high-converting web apps, to targeted ads and rigorous data management.",
-      imageSrc: "/hero-thumbnail.jpg",
+      imageSrc: "/hero_ai_os.png",
       highlight: "Founder Overview"
     },
     {
       title: "COMPLEX AUTOMATIONS MADE SIMPLE",
       subtitle: "Connect disparate systems with n8n to save hundreds of hours of manual work every week.",
-      imageSrc: "/media__1780287107773.png",
+      imageSrc: "/hero_automations.png",
       highlight: "n8n Workflows"
     },
     {
       title: "DATA-DRIVEN GROWTH",
       subtitle: "Highlighting ROI tracking across Google Ads, Meta Ads, and blended analytics for precise scaling.",
-      imageSrc: "/media__1780287265332.png",
+      imageSrc: "/hero_growth.png",
       highlight: "Ads & Analytics"
     },
     {
       title: "PRISTINE DATA MANAGEMENT",
       subtitle: "Showcasing accuracy and organization for large datasets, CRMs, and catalog restructuring.",
-      imageSrc: "/media__1780287355326.png",
+      imageSrc: "/hero_data_management.png",
       highlight: "Data Entry"
     },
     {
       title: "HIGH-CONVERTING INFRASTRUCTURE",
       subtitle: "Building the custom web and mobile applications your business runs on.",
-      imageSrc: "/media__1780287419000.png",
+      imageSrc: "/hero_web_dev.png",
       highlight: "Web Development"
     }
   ];
@@ -94,13 +94,33 @@ export function MynaHero() {
 
   return (
     <div ref={ref} className="w-full relative bg-background overflow-hidden min-h-screen flex items-center">
+      {/* Dynamic Background Image */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={`bg-${activeSlide}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.12 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.8 }}
+          className="absolute inset-0 z-0 pointer-events-none"
+        >
+          <Image
+            src={currentSlide.imageSrc}
+            alt="background"
+            fill
+            className="object-cover filter blur-[100px] scale-110"
+            priority
+          />
+        </motion.div>
+      </AnimatePresence>
+
       {/* Animated Grid Pattern */}
-      <div className="absolute inset-0 bg-grid-pattern animate-grid-fade" />
+      <div className="absolute inset-0 bg-grid-pattern animate-grid-fade opacity-50 z-[1]" />
 
       {/* Gradient Orbs */}
-      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/15 rounded-full blur-[150px] animate-float" />
-      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px] animate-float" style={{ animationDelay: '3s' }} />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/8 rounded-full blur-[180px]" />
+      <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-primary/15 rounded-full blur-[150px] animate-float z-[1]" />
+      <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-accent/10 rounded-full blur-[120px] animate-float z-[1]" style={{ animationDelay: '3s' }} />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/8 rounded-full blur-[180px] z-[1]" />
 
       <main className="w-full">
         <section className="container py-24 md:py-32 relative z-10">
