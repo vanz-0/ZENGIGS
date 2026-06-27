@@ -198,10 +198,10 @@ def send_email(smtp_config: SMTPConfig, to_email: str, subject: str, body: str) 
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))
 
-    max_retries = 3
-    for attempt in range(max_retries):
+    max_retries = 2  # Max 2 retries (30s + 60s = 90s ceiling — never blocks the queue for hours)
+    for attempt in range(max_retries + 1):
         try:
-            with smtplib.SMTP(smtp_config.host, smtp_config.port, timeout=30) as server:
+            with smtplib.SMTP(smtp_config.host, smtp_config.port, timeout=20) as server:
                 server.starttls()
                 server.login(smtp_config.email, smtp_config.password)
                 server.send_message(msg)
@@ -213,10 +213,10 @@ def send_email(smtp_config: SMTPConfig, to_email: str, subject: str, body: str) 
             logger.error("SMTP Authentication Error. Check .env credentials.")
             return False
         except Exception as e:
-            if attempt == max_retries - 1:
-                logger.error(f"SMTP error after {max_retries} attempts: {e}")
+            if attempt == max_retries:
+                logger.error(f"SMTP failed after {max_retries + 1} attempts, skipping: {e}")
                 return False
-            wait_time = 30 * (attempt + 1)
+            wait_time = 30 * (2 ** attempt)  # 30s, then 60s
             logger.warning(f"SMTP error: {e}. Retrying in {wait_time}s...")
             time.sleep(wait_time)
     return False

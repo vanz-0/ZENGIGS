@@ -8,7 +8,7 @@ from cold_email_sender import SMTPConfig, send_email, personalize_email
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-INPUT_FILE = ".tmp/free_verified_emails.csv"
+INPUT_FILE = ".tmp/gmail_leads.csv"
 SENT_FILE = ".tmp/sent_emails.csv"
 TEMPLATE = "master_v4"
 BATCH_SIZE = 30
@@ -45,7 +45,21 @@ def send_batch():
 
     logger.info(f"Starting batch of {len(batch)} emails...")
 
+    # Pre-calculate random send times within a 2-hour window (7200 seconds)
+    # This guarantees the first email does NOT go out exactly at 5:00 PM
+    send_times = sorted([random.randint(60, 7200) for _ in range(len(batch))])
+    
+    start_time = time.time()
+    
     for i, lead_data in enumerate(batch):
+        # Calculate delay to hit our randomly scheduled time
+        target_time = start_time + send_times[i]
+        now = time.time()
+        if target_time > now:
+            delay = target_time - now
+            logger.info(f"  \u23f3 Waiting {delay:.1f}s until next randomly scheduled send...")
+            time.sleep(delay)
+
         # Convert CSV row to the format expected by personalize_email
         email = lead_data.get("email", "").strip()
         raw_name = lead_data.get("name", "").strip()
@@ -82,12 +96,6 @@ def send_batch():
         else:
             logger.error(f"  \u274c Failed to send.")
             failed_count += 1
-
-        # Rate limiting
-        if i < len(batch) - 1:
-            delay = random.randint(45, 90)
-            logger.info(f"  \u23f3 Waiting {delay}s...")
-            time.sleep(delay)
 
     logger.info("--- Batch Complete ---")
     logger.info(f"Sent: {sent_count}")

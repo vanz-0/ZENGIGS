@@ -10,8 +10,8 @@ import {
   Play
 } from "lucide-react";
 import { motion, useAnimation, useInView, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import { InteractiveHoverButton } from "./InteractiveHoverButton";
-import { VideoModal } from "./VideoModal";
 
 const roles = [
   "AI Operating System Specialists",
@@ -31,7 +31,6 @@ export function MynaHero() {
   const controls = useAnimation();
   const ref = React.useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.1 });
-  const [isVideoModalOpen, setIsVideoModalOpen] = React.useState(false);
   const [roleIndex, setRoleIndex] = React.useState(0);
 
   const [activeSlide, setActiveSlide] = React.useState(0);
@@ -39,36 +38,31 @@ export function MynaHero() {
     {
       title: "YOUR AI OPERATING SYSTEM",
       subtitle: "We build unified digital infrastructure. From AI automations and high-converting web apps, to targeted ads and rigorous data management.",
-      videoSrc: "/hero-video.mp4",
-      poster: "/hero-thumbnail.jpg",
+      imageSrc: "/hero-thumbnail.jpg",
       highlight: "Founder Overview"
     },
     {
       title: "COMPLEX AUTOMATIONS MADE SIMPLE",
       subtitle: "Connect disparate systems with n8n to save hundreds of hours of manual work every week.",
-      videoSrc: "/n8n-workflow.mp4", // Placeholder
-      poster: "/n8n-thumbnail.jpg", // Placeholder
+      imageSrc: "/media__1780287107773.png",
       highlight: "n8n Workflows"
     },
     {
       title: "DATA-DRIVEN GROWTH",
       subtitle: "Highlighting ROI tracking across Google Ads, Meta Ads, and blended analytics for precise scaling.",
-      videoSrc: "/analytics.mp4", // Placeholder
-      poster: "/analytics-thumbnail.jpg", // Placeholder
+      imageSrc: "/media__1780287265332.png",
       highlight: "Ads & Analytics"
     },
     {
       title: "PRISTINE DATA MANAGEMENT",
       subtitle: "Showcasing accuracy and organization for large datasets, CRMs, and catalog restructuring.",
-      videoSrc: "/data-entry.mp4", // Placeholder
-      poster: "/data-thumbnail.jpg", // Placeholder
+      imageSrc: "/media__1780287355326.png",
       highlight: "Data Entry"
     },
     {
       title: "HIGH-CONVERTING INFRASTRUCTURE",
       subtitle: "Building the custom web and mobile applications your business runs on.",
-      videoSrc: "/web-dev.mp4", // Placeholder
-      poster: "/web-thumbnail.jpg", // Placeholder
+      imageSrc: "/media__1780287419000.png",
       highlight: "Web Development"
     }
   ];
@@ -190,7 +184,7 @@ export function MynaHero() {
                 className="mt-12 flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-6 w-full sm:w-auto"
               >
                 <div className="animate-pulse-glow rounded-full w-full sm:w-auto">
-                  <a href="#book-call" className="block">
+                  <a href="#contact" className="block">
                     <InteractiveHoverButton text="Book a Strategy Call" />
                   </a>
                 </div>
@@ -206,32 +200,20 @@ export function MynaHero() {
 
             {/* Right Column: Video Player */}
             <motion.div
-              key={`video-${activeSlide}`}
+              key={`image-${activeSlide}`}
               initial={{ opacity: 0, scale: 0.95, x: 20 }}
               animate={{ opacity: 1, scale: 1, x: 0 }}
               transition={{ duration: 0.5, type: "spring", stiffness: 50 }}
               className="relative w-full max-w-[450px] mx-auto aspect-[9/16] md:aspect-[3/4] lg:aspect-[4/5] rounded-3xl overflow-hidden glass gradient-border group mt-12 lg:mt-0"
             >
-              <div 
-                className="absolute inset-0 bg-black/40 hover:bg-black/20 transition-colors duration-500 z-10 flex items-center justify-center cursor-pointer group/play"
-                onClick={() => setIsVideoModalOpen(true)}
-              >
-                 <div className="w-20 h-20 rounded-full bg-primary/80 flex items-center justify-center backdrop-blur-md shadow-2xl scale-90 group-hover/play:scale-110 transition-transform">
-                   <Play className="w-8 h-8 text-white ml-1" />
-                 </div>
-              </div>
               
-              <video 
-                src={currentSlide.videoSrc} 
-                poster={currentSlide.poster}
-                loop 
-                muted 
-                autoPlay
-                playsInline
+              <Image 
+                src={currentSlide.imageSrc} 
+                alt={currentSlide.title}
+                fill
+                priority
                 className="absolute inset-0 w-full h-full object-cover"
-              >
-                Your browser does not support the video tag.
-              </video>
+              />
 
               {/* Carousel Arrows */}
               <div className="absolute inset-y-0 left-4 right-4 flex items-center justify-between z-20 pointer-events-none">
@@ -243,7 +225,7 @@ export function MynaHero() {
                 </button>
               </div>
 
-              {/* Decorative elements around video */}
+              {/* Decorative elements around image */}
               <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-primary/20 blur-2xl rounded-full z-0 pointer-events-none" />
               <div className="absolute -top-4 -left-4 w-32 h-32 bg-accent/20 blur-2xl rounded-full z-0 pointer-events-none" />
             </motion.div>
@@ -251,12 +233,6 @@ export function MynaHero() {
           </div>
         </section>
       </main>
-
-      <VideoModal 
-        isOpen={isVideoModalOpen} 
-        onClose={() => setIsVideoModalOpen(false)} 
-        videoSrc={currentSlide.videoSrc} 
-      />
     </div>
   );
 }

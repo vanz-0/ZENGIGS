@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 """
-Reddit Lead Scraper — Free (No Apify)
-Uses Reddit's public JSON API to find business owners posting about needing
-video editing, content creation, social media, or automation help.
+Reddit Lead Scraper — via Apify (automation-lab/reddit-scraper)
+Uses Apify to bypass Reddit's 403 blocks on the public JSON API.
 
 Usage:
     python execution/reddit_scraper.py
-    python execution/reddit_scraper.py --subreddits smallbusiness,entrepreneur --limit 50
+    python execution/reddit_scraper.py --limit 50
     python execution/reddit_scraper.py --push-to-sheet
 """
 
@@ -24,7 +23,11 @@ load_dotenv()
 
 # ─── CONFIG ───────────────────────────────────────────────────────────────────
 
-# Subreddits to search — business owners, entrepreneurs, social media managers
+APIFY_TOKEN = os.getenv("APIFY_API_TOKEN", "")
+ACTOR_ID = "automation-lab~reddit-scraper"
+APIFY_BASE = "https://api.apify.com/v2"
+
+# Subreddits to search
 TARGET_SUBREDDITS = [
     "smallbusiness",
     "entrepreneur",
@@ -34,120 +37,84 @@ TARGET_SUBREDDITS = [
     "videography",
     "youtubers",
     "content_marketing",
-    "Entrepreneur",
     "ecommerce",
 ]
 
-# Keywords that indicate someone NEEDS our services
-BUY_SIGNAL_KEYWORDS = [
-    "looking for editor", "need editor", "need a video editor", "hire editor",
-    "looking for video", "video editing help", "edit my videos", "editing my content",
-    "social media manager", "content creator", "need content", "create content",
-    "short form", "short-form", "reels", "tiktok editor", "youtube editor",
-    "looking for someone", "hiring", "need help with", "can anyone help",
-    "caption", "subtitles", "auto captions", "looking for freelancer",
-    "need a freelancer", "outsource", "va needed", "virtual assistant",
-    "motion graphics", "intro video", "promo video", "promotional video",
-    "ugc", "user generated content", "brand video", "product video",
-]
-
-# Subreddit-specific search queries
+# Search queries
 SEARCH_QUERIES = [
-    "need video editor",
-    "looking for editor",
-    "hire content creator",
-    "need social media help",
-    "video editing freelancer",
-    "need someone to edit",
-    "looking for social media manager",
-    "UGC creator needed",
-    "short form content help",
-    "YouTube editor needed",
+    "need more sales calls",
+    "website not converting",
+    "looking for video editor",
+    "need social media manager",
+    "cold email help",
+    "seo help needed",
+    "need a bookkeeper",
+    "looking for appointment setter",
 ]
 
-HEADERS = {
-    "User-Agent": "ZENGIGS-LeadBot/1.0 (lead generation research; contact maxwellhutter123@gmail.com)",
-    "Accept": "application/json",
-}
+# Buy-signal keywords for post filtering
+BUY_SIGNAL_KEYWORDS = [
+    "seo audit", "need seo help", "website redesign", "web design help",
+    "bounce rate", "landing page conversion",
+    "google ads help", "facebook ads roas", "need social media manager",
+    "content creator needed", "need video editor", "tiktok editor",
+    "youtube editor", "podcast editor",
+    "need more leads", "sales calls", "cold email strategy",
+    "email deliverability", "crm setup", "hubspot setup",
+    "lead generation agency", "appointment setter",
+    "zapier expert", "make.com", "ai chatbot", "customer service bot",
+    "bookkeeping help", "virtual assistant needed", "hiring va",
+    "need a freelancer", "outsource",
+]
 
 OUTPUT_PATH = ".tmp/reddit_leads.json"
 
 
-# ─── SCRAPER ──────────────────────────────────────────────────────────────────
+# ─── APIFY RUNNER ─────────────────────────────────────────────────────────────
 
-def search_reddit(subreddit: str, query: str, limit: int = 25, sort: str = "new") -> list[dict]:
-    """Search a subreddit using Reddit's free public JSON API."""
-    url = f"https://www.reddit.com/r/{subreddit}/search.json"
-    params = {
-        "q": query,
-        "restrict_sr": "true",  # Only search this subreddit
-        "sort": sort,
-        "limit": limit,
-        "t": "month",  # Posts from last month
-    }
+def run_apify_actor(input_data: dict, timeout_secs: int = 120) -> list[dict]:
+    """Run an Apify actor synchronously and return the dataset items."""
+    if not APIFY_TOKEN:
+        print("ERROR: APIFY_API_TOKEN not set in .env")
+        return []
 
+    run_url = f"{APIFY_BASE}/acts/{ACTOR_ID}/run-sync-get-dataset-items"
+    params = {"token": APIFY_TOKEN, "timeout": timeout_secs, "memory": 256}
+
+    print(f"  Calling Apify actor '{ACTOR_ID}'...")
     try:
-        resp = requests.get(url, headers=HEADERS, params=params, timeout=15)
-        if resp.status_code == 429:
-            print(f"  ⚠️  Rate limited on r/{subreddit}. Waiting 30s...")
-            time.sleep(30)
-            resp = requests.get(url, headers=HEADERS, params=params, timeout=15)
-
-        if resp.status_code != 200:
-            print(f"  ✗ r/{subreddit} returned {resp.status_code}")
+        resp = requests.post(run_url, json=input_data, params=params, timeout=timeout_secs + 30)
+        if resp.status_code == 201 or resp.status_code == 200:
+            return resp.json() if isinstance(resp.json(), list) else []
+        else:
+            print(f"  Apify returned {resp.status_code}: {resp.text[:300]}")
             return []
-
-        data = resp.json()
-        posts = data.get("data", {}).get("children", [])
-        return [p["data"] for p in posts if p.get("kind") == "t3"]
-
+    except requests.exceptions.Timeout:
+        print("  Apify run timed out.")
+        return []
     except Exception as e:
-        print(f"  ✗ Error fetching r/{subreddit}: {e}")
+        print(f"  Apify error: {e}")
         return []
 
 
-def get_hot_posts(subreddit: str, limit: int = 25) -> list[dict]:
-    """Get hot/new posts from a subreddit directly."""
-    url = f"https://www.reddit.com/r/{subreddit}/new.json"
-    params = {"limit": limit}
-
-    try:
-        resp = requests.get(url, headers=HEADERS, params=params, timeout=15)
-        if resp.status_code != 200:
-            return []
-        data = resp.json()
-        posts = data.get("data", {}).get("children", [])
-        return [p["data"] for p in posts if p.get("kind") == "t3"]
-    except Exception as e:
-        print(f"  ✗ Error: {e}")
-        return []
-
+# ─── FILTERING & FORMATTING ───────────────────────────────────────────────────
 
 def is_relevant_post(post: dict) -> bool:
-    """Check if a post signals someone needs video/content services."""
+    """Check if a post signals someone needs video/content/marketing services."""
     title = (post.get("title") or "").lower()
-    text = (post.get("selftext") or "").lower()
+    text = (post.get("body") or post.get("selftext") or "").lower()
     combined = title + " " + text
-
-    # Must match at least one buy signal keyword
     for kw in BUY_SIGNAL_KEYWORDS:
         if kw.lower() in combined:
             return True
     return False
 
 
-def extract_contact_hints(post: dict) -> dict:
-    """Try to extract any contact info mentioned in the post."""
-    text = (post.get("selftext") or "") + " " + (post.get("title") or "")
-
-    # Email pattern
+def extract_contact_hints(text: str) -> dict:
+    """Extract emails and websites from post text."""
     emails = re.findall(r"[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}", text)
-
-    # Website pattern
     websites = re.findall(r"https?://(?:www\.)?[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}(?:/[^\s]*)?", text)
-    # Filter out reddit/imgur links
     websites = [w for w in websites if not any(x in w for x in ["reddit.com", "imgur.com", "i.redd.it"])]
-
     return {
         "emails_found": ", ".join(set(emails)) if emails else "",
         "websites_found": ", ".join(set(websites[:3])) if websites else "",
@@ -155,30 +122,42 @@ def extract_contact_hints(post: dict) -> dict:
 
 
 def format_post(post: dict) -> dict:
-    """Format a Reddit post into a clean lead record."""
-    contact_hints = extract_contact_hints(post)
+    """Normalize an Apify Reddit post into a clean lead record."""
+    raw_text = (post.get("body") or post.get("selftext") or "")
+    raw_title = (post.get("title") or "")
+    contact = extract_contact_hints(raw_text + " " + raw_title)
 
-    # Parse timestamp
-    created_utc = post.get("created_utc", 0)
-    try:
-        posted_at = datetime.fromtimestamp(created_utc, tz=timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    except Exception:
-        posted_at = ""
+    # Apify timestamps may come as ISO strings or unix
+    posted_at = ""
+    ts = post.get("createdAt") or post.get("created_utc")
+    if ts:
+        try:
+            if isinstance(ts, (int, float)):
+                posted_at = datetime.fromtimestamp(ts, tz=timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+            else:
+                posted_at = str(ts)
+        except Exception:
+            pass
+
+    subreddit = post.get("subreddit") or post.get("communityName") or ""
+    permalink = post.get("url") or post.get("permalink") or ""
+    if permalink and not permalink.startswith("http"):
+        permalink = f"https://reddit.com{permalink}"
 
     return {
         "source": "reddit",
         "scraped_at": datetime.now().isoformat(),
-        "subreddit": post.get("subreddit", ""),
-        "title": post.get("title", ""),
-        "body": (post.get("selftext") or "")[:1000],  # Truncate long posts
-        "author": post.get("author", ""),
-        "reddit_url": f"https://reddit.com{post.get('permalink', '')}",
-        "score": post.get("score", 0),
-        "num_comments": post.get("num_comments", 0),
+        "subreddit": subreddit,
+        "title": raw_title,
+        "body": raw_text[:1000],
+        "author": post.get("author") or post.get("username") or "",
+        "reddit_url": permalink,
+        "score": post.get("score") or post.get("upvotes") or 0,
+        "num_comments": post.get("numberOfComments") or post.get("num_comments") or 0,
         "posted_at": posted_at,
-        "flair": post.get("link_flair_text", ""),
-        "emails_found": contact_hints["emails_found"],
-        "websites_found": contact_hints["websites_found"],
+        "flair": post.get("flair") or post.get("link_flair_text") or "",
+        "emails_found": contact["emails_found"],
+        "websites_found": contact["websites_found"],
         "outreach_sent": "No",
         "notes": "",
     }
@@ -210,7 +189,7 @@ def push_to_sheet(leads: list[dict], sheet_url: str):
                 with open("token.json", "w") as f:
                     f.write(creds.to_json())
             else:
-                print("❌ No valid Google credentials. Run create_sheet.py first.")
+                print("No valid Google credentials. Run create_sheet.py first.")
                 return
 
         client = gspread.authorize(creds)
@@ -252,24 +231,24 @@ def push_to_sheet(leads: list[dict], sheet_url: str):
             "textFormat": {"bold": True},
             "backgroundColor": {"red": 0.1, "green": 0.1, "blue": 0.2},
         })
-        print(f"✅ Pushed {len(leads)} Reddit leads to 'Reddit Leads' tab.")
+        print(f"Pushed {len(leads)} Reddit leads to 'Reddit Leads' tab.")
 
     except ImportError:
-        print("⚠️  gspread not installed. Skipping sheet push.")
+        print("gspread not installed. Skipping sheet push.")
     except Exception as e:
-        print(f"❌ Sheet push failed: {e}")
+        print(f"Sheet push failed: {e}")
 
 
 # ─── MAIN ─────────────────────────────────────────────────────────────────────
 
 def main():
-    parser = argparse.ArgumentParser(description="Reddit lead scraper — no Apify needed")
+    parser = argparse.ArgumentParser(description="Reddit lead scraper via Apify")
     parser.add_argument("--subreddits", default=",".join(TARGET_SUBREDDITS[:5]),
                         help="Comma-separated subreddits to search")
     parser.add_argument("--queries", default=",".join(SEARCH_QUERIES[:4]),
                         help="Comma-separated search queries")
     parser.add_argument("--limit", type=int, default=25,
-                        help="Posts per subreddit per query (default: 25)")
+                        help="Max posts per query (default: 25)")
     parser.add_argument("--output", default=OUTPUT_PATH,
                         help="Output JSON file path")
     parser.add_argument("--push-to-sheet", action="store_true",
@@ -284,54 +263,60 @@ def main():
 
     os.makedirs(os.path.dirname(args.output), exist_ok=True)
 
-    all_posts = {}  # Deduplicate by post ID
+    all_posts = {}  # Deduplicate by post URL
     total_fetched = 0
 
-    print(f"\n🔍 Reddit Lead Scraper — {len(subreddits)} subreddits × {len(queries)} queries")
+    print(f"\nReddit Lead Scraper via Apify")
+    print(f"{len(subreddits)} subreddits x {len(queries)} queries")
     print("=" * 60)
 
     for subreddit in subreddits:
-        print(f"\n📌 r/{subreddit}")
         for query in queries:
-            print(f"   Searching: '{query}'...")
-            posts = search_reddit(subreddit, query, limit=args.limit)
-            relevant = [p for p in posts if is_relevant_post(p)]
+            print(f"\n  r/{subreddit} | '{query}'")
+
+            actor_input = {
+                "searchQueries": [query],
+                "subreddits": [subreddit],
+                "maxPosts": args.limit,
+                "sort": "new",
+                "time": "month",
+            }
+
+            raw_posts = run_apify_actor(actor_input, timeout_secs=90)
+            relevant = [p for p in raw_posts if is_relevant_post(p)]
+
             for p in relevant:
-                post_id = p.get("id", "")
-                if post_id and post_id not in all_posts:
-                    all_posts[post_id] = format_post(p)
+                key = p.get("url") or p.get("id") or p.get("title", "")[:80]
+                if key and key not in all_posts:
+                    all_posts[key] = format_post(p)
                     total_fetched += 1
 
-            print(f"   Found {len(relevant)} relevant out of {len(posts)} posts")
-            time.sleep(2)  # Respect rate limits
+            print(f"  Found {len(relevant)} relevant out of {len(raw_posts)} posts")
+            time.sleep(1)  # Small pause between actor calls
 
     leads = list(all_posts.values())
-    # Sort by score (most upvoted = most active = better signal)
     leads.sort(key=lambda x: x.get("score", 0), reverse=True)
 
     print(f"\n{'='*60}")
-    print(f"✅ Total unique qualified leads: {len(leads)}")
+    print(f"Total unique qualified leads: {len(leads)}")
 
-    # Save to JSON
     with open(args.output, "w", encoding="utf-8") as f:
         json.dump(leads, f, indent=2, ensure_ascii=False)
-    print(f"💾 Saved to {args.output}")
+    print(f"Saved to {args.output}")
 
-    # Print sample
     if leads:
         sample = leads[0]
-        print(f"\n📋 Top Lead:")
-        print(f"   r/{sample['subreddit']} — {sample['title'][:80]}")
-        print(f"   Author: u/{sample['author']} | Score: {sample['score']}")
-        print(f"   URL: {sample['reddit_url']}")
+        print(f"\nTop Lead:")
+        print(f"  r/{sample['subreddit']} - {sample['title'][:80]}")
+        print(f"  Author: u/{sample['author']} | Score: {sample['score']}")
+        print(f"  URL: {sample['reddit_url']}")
         if sample["emails_found"]:
-            print(f"   📧 Email found: {sample['emails_found']}")
+            print(f"  Email found: {sample['emails_found']}")
         if sample["websites_found"]:
-            print(f"   🌐 Website: {sample['websites_found']}")
+            print(f"  Website: {sample['websites_found']}")
 
-    # Push to sheet if requested
     if args.push_to_sheet and leads:
-        print(f"\n📤 Pushing to Google Sheet...")
+        print(f"\nPushing to Google Sheet...")
         push_to_sheet(leads, args.sheet_url)
 
     return leads

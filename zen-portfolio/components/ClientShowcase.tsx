@@ -281,15 +281,27 @@ export function ClientShowcase() {
               </p>
             </div>
 
-            <div className="relative z-10 shrink-0">
+            <div className="relative z-10 shrink-0 flex flex-col md:flex-row gap-4">
+              {/* TODO: Replace href with actual Google Drive URL for System Archive */}
               <a 
-                href="#" 
+                href="https://drive.google.com/drive/folders/PLACEHOLDER_SYSTEM_ARCHIVE" 
                 target="_blank" 
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 hover:bg-primary/20 border border-white/10 hover:border-primary/50 rounded-full font-mono text-sm font-bold transition-all duration-300 group shadow-lg"
               >
                 <FolderDown className="w-5 h-5 text-primary group-hover:-translate-y-1 transition-transform" />
-                Access Google Drive
+                System Archive Drive
+              </a>
+
+              {/* TODO: Replace href with actual Google Drive URL for Gigs & Proposals */}
+              <a 
+                href="https://drive.google.com/drive/folders/PLACEHOLDER_GIGS_PROPOSALS" 
+                target="_blank" 
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white/5 hover:bg-accent/20 border border-white/10 hover:border-accent/50 rounded-full font-mono text-sm font-bold transition-all duration-300 group shadow-lg"
+              >
+                <FolderDown className="w-5 h-5 text-accent group-hover:-translate-y-1 transition-transform" />
+                Gigs & Proposals Drive
               </a>
             </div>
           </motion.div>
