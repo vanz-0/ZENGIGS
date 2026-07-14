@@ -2,71 +2,42 @@
 """
 ZENGIGS Master Pipeline Orchestrator.
 
-Orchestrates the entire flow from scraping leads to sending outreach emails.
-Follows the directives laid out in directives/02_cold_outreach_system.md and 05_lead_scraping.md.
-
-Usage:
-    python execution/pipeline_orchestrator.py --action scrape --query "Coaches" --location "UK"
-    python execution/pipeline_orchestrator.py --action outreach --template cold_intro
+Enqueues jobs into the Supabase workflow_jobs table for the worker to process.
 """
 
 import os
 import sys
-import subprocess
 import argparse
 import logging
-from datetime import datetime
+from dotenv import load_dotenv
+from supabase import create_client
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - [ORCHESTRATOR] - %(message)s')
 logger = logging.getLogger(__name__)
 
-def run_script(script_name: str, args: list) -> bool:
-    """Run a Python script as a subprocess."""
-    cmd = [sys.executable, f"execution/{script_name}"] + args
-    logger.info(f"Executing: {' '.join(cmd)}")
-    
+# Load Supabase
+load_dotenv()
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_SERVICE_ROLE_KEY") or os.getenv("SUPABASE_ANON_KEY")
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY) if SUPABASE_URL else None
+
+def enqueue_job(job_type: str, parameters: dict):
+    if not supabase:
+        logger.error("Supabase credentials missing. Cannot enqueue job.")
+        return
     try:
-        result = subprocess.run(cmd, check=True, text=True, capture_output=True)
-        logger.info(f"Script output:\n{result.stdout}")
-        return True
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Script failed with error code {e.returncode}")
-        logger.error(f"Error output:\n{e.stderr}")
-        return False
-
-def run_scrape(query: str, location: str, max_items: int, mode: str):
-    """Run the scraping and normalization pipeline."""
-    logger.info(f"=== Starting Scrape Pipeline (Mode: {mode}) ===")
-    args = [
-        "--query", query,
-        "--location", location,
-        "--max_items", str(max_items),
-        "--mode", mode
-    ]
-    success = run_script("scrape_leads.py", args)
-    if success:
-        logger.info("Scrape Pipeline Completed Successfully.")
-    else:
-        logger.error("Scrape Pipeline Failed.")
-
-def run_outreach(template: str, daily_cap: int, dry_run: bool):
-    """Run the cold outreach pipeline."""
-    logger.info("=== Starting Outreach Pipeline ===")
-    args = [
-        "--template", template,
-        "--daily_cap", str(daily_cap)
-    ]
-    if dry_run:
-        args.append("--dry_run")
-        
-    success = run_script("cold_email_sender.py", args)
-    if success:
-        logger.info("Outreach Pipeline Completed Successfully.")
-    else:
-        logger.error("Outreach Pipeline Failed.")
+        data = {
+            "job_type": job_type,
+            "parameters": parameters,
+            "status": "pending"
+        }
+        res = supabase.table("workflow_jobs").insert(data).execute()
+        logger.info(f"Successfully enqueued {job_type} job. ID: {res.data[0]['id']}")
+    except Exception as e:
+        logger.error(f"Failed to enqueue job: {e}")
 
 def main():
-    parser = argparse.ArgumentParser(description="ZENGIGS Master Pipeline Orchestrator")
+    parser = argparse.ArgumentParser(description="ZENGIGS Master Pipeline Orchestrator (Job Enqueuer)")
     parser.add_argument("--action", choices=["scrape", "outreach", "full"], required=True, help="Action to perform")
     
     # Scrape args
@@ -86,10 +57,19 @@ def main():
         if not args.query or not args.location:
             logger.error("--query and --location are required for scraping.")
             sys.exit(1)
-        run_scrape(args.query, args.location, args.max_items, args.mode)
+        enqueue_job("scrape", {
+            "query": args.query,
+            "location": args.location,
+            "max_items": args.max_items,
+            "mode": args.mode
+        })
         
     if args.action in ["outreach", "full"]:
-        run_outreach(args.template, args.daily_cap, args.dry_run)
+        enqueue_job("outreach", {
+            "template": args.template,
+            "daily_cap": args.daily_cap,
+            "dry_run": args.dry_run
+        })
 
 if __name__ == "__main__":
     main()

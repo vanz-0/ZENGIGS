@@ -2,7 +2,7 @@ import csv
 import os
 import time
 
-VERIFIED_EMAILS_PATH = "../.tmp/verified_emails.csv"
+VERIFIED_EMAILS_PATH = "../.tmp/free_verified_emails.csv"
 OUTREACH_API_KEY = os.getenv("OUTREACH_API_KEY", "your_outreach_api_key")
 CAMPAIGN_ID = "us_online_services_campaign"
 DAILY_LIMIT = 200 # Across all senders

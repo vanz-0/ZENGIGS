@@ -26,7 +26,7 @@ export default function AdminPage() {
 
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
-        router.push('/login');
+        router.push('/internal-dashboard/login');
       } else {
         setAuthenticated(true);
         setLoading(false);
