@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import {
   InstagramIcon,
   LinkedinIcon,
@@ -8,9 +9,37 @@ import {
   Mail,
   Phone,
   ArrowUpRight,
+  Loader2,
 } from 'lucide-react';
 
 export function MinimalFooter() {
+  const [email, setEmail] = useState('');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setStatus('loading');
+    
+    try {
+      const res = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      
+      if (!res.ok) throw new Error(data.error || 'Failed to subscribe');
+      
+      setStatus('success');
+      setMessage(data.message || 'Successfully subscribed!');
+      setEmail('');
+    } catch (err: any) {
+      setStatus('error');
+      setMessage(err.message || 'Something went wrong');
+    }
+  };
+
   const year = new Date().getFullYear();
 
   const socialLinks = [
@@ -75,21 +104,30 @@ export function MinimalFooter() {
               <p className="text-sm text-muted-foreground font-mono text-center mb-2">Not ready for a call? Get our best strategies via email.</p>
               <form 
                 className="w-full flex flex-col gap-3"
-                onSubmit={(e) => { e.preventDefault(); alert("Brevo API integration coming soon!"); }}
+                onSubmit={handleSubscribe}
               >
                 <input 
                   type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email" 
                   required
-                  className="w-full bg-black/50 border border-white/20 rounded-xl px-4 py-3.5 text-sm font-mono text-foreground focus:outline-none focus:border-primary transition-colors placeholder:text-muted-foreground/50"
+                  disabled={status === 'loading' || status === 'success'}
+                  className="w-full bg-black/50 border border-white/20 rounded-xl px-4 py-3.5 text-sm font-mono text-foreground focus:outline-none focus:border-primary transition-colors placeholder:text-muted-foreground/50 disabled:opacity-50"
                 />
                 <button 
                   type="submit"
-                  className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl font-mono text-sm font-bold hover:shadow-[0_0_20px_hsla(270,95%,65%,0.3)] transition-all flex items-center justify-center gap-2"
+                  disabled={status === 'loading' || status === 'success'}
+                  className="w-full py-3.5 bg-primary text-primary-foreground rounded-xl font-mono text-sm font-bold hover:shadow-[0_0_20px_hsla(270,95%,65%,0.3)] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
-                  <Mail className="w-4 h-4" />
-                  Send Me the Guide
+                  {status === 'loading' ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+                  {status === 'loading' ? 'Subscribing...' : status === 'success' ? 'Subscribed!' : 'Send Me the Guide'}
                 </button>
+                {message && (
+                  <p className={`text-xs font-mono text-center ${status === 'error' ? 'text-red-400' : 'text-green-400'}`}>
+                    {message}
+                  </p>
+                )}
               </form>
             </div>
           </div>
