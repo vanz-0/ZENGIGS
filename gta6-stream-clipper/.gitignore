@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.env
+
+# Clipper outputs & cache
+.tmp/
+output/
+downloads/
+*.webm
+*.part
+*.wav
+
+# Neural Models
+models/*.bin
+models/*.onnx
+
+# OS
+.DS_Store
+Thumbs.db
